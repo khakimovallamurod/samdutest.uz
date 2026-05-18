@@ -2,6 +2,53 @@
 
 require_once __DIR__ . '/../routes/role_routes.php';
 
+function app_base_prefix()
+{
+    static $prefix = null;
+    if ($prefix !== null) {
+        return $prefix;
+    }
+
+    $scriptName = (string) ($_SERVER['SCRIPT_NAME'] ?? '');
+    $needle = '/test/';
+    $pos = strpos($scriptName, $needle);
+    if ($pos === false) {
+        $prefix = '';
+        return $prefix;
+    }
+
+    $prefix = rtrim(substr($scriptName, 0, $pos), '/');
+    return $prefix;
+}
+
+function app_path($path)
+{
+    $path = (string) $path;
+    if ($path === '' || $path[0] !== '/') {
+        return $path;
+    }
+
+    return app_base_prefix() . $path;
+}
+
+function rewrite_test_root_links($buffer)
+{
+    $prefix = app_base_prefix();
+    if ($prefix === '') {
+        return $buffer;
+    }
+
+    return str_replace(
+        ['="/test/', "='/test/", 'url(/test/'],
+        ['="' . $prefix . '/test/', "='" . $prefix . "/test/", 'url(' . $prefix . '/test/'],
+        $buffer
+    );
+}
+
+if (PHP_SAPI !== 'cli') {
+    ob_start('rewrite_test_root_links');
+}
+
 function app_config()
 {
     static $config = null;
@@ -67,7 +114,7 @@ function flash_get($key)
 
 function redirect($path)
 {
-    header('Location: ' . $path);
+    header('Location: ' . app_path($path));
     exit;
 }
 

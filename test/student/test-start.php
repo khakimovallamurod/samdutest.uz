@@ -60,6 +60,7 @@ try {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><?= htmlspecialchars($test['title'], ENT_QUOTES, 'UTF-8') ?> | Test</title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body class="bg-slate-50 text-slate-800">
   <main class="mx-auto max-w-4xl p-4 sm:p-6">

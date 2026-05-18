@@ -9,7 +9,7 @@ if(!column_exists($db,'test_questions','question_type')){$db->query("ALTER TABLE
 $st=$db->prepare('INSERT INTO test_questions (test_id,teacher_id,question_text,question_type,option_a,option_b,option_c,option_d,correct_option,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,NOW(),NOW())');
 $sanitize=function($html){
     $html=(string)$html;
-    $allowed='<p><br><b><strong><i><em><u><s><sub><sup><ol><ul><li><span><div><img>';
+    $allowed='<p><br><b><strong><i><em><u><s><sub><sup><ol><ul><li><span><div><img><table><tbody><thead><tr><td><th><math><mrow><mi><mn><mo><msup><msub><msubsup><mfrac><msqrt><mroot><mtext><mfenced><mtable><mtr><mtd>';
     return trim(strip_tags($html,$allowed));
 };
 $created=0; foreach((array)$items as $it){$q=$sanitize($it['question_text']??''); if(trim(strip_tags($q))==='') continue; $qt=trim((string)($it['question_type']??'closed')); if(!in_array($qt,['open','closed'],true))$qt='closed'; $a=$sanitize($it['option_a']??'');$b=$sanitize($it['option_b']??'');$c=$sanitize($it['option_c']??'');$d=$sanitize($it['option_d']??'');$co=trim((string)($it['correct_option']??''));

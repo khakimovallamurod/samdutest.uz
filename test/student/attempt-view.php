@@ -47,6 +47,7 @@ $menu = [
 
 ob_start();
 ?>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <?php if ($error || $success): ?>
   <div class="rounded-xl px-4 py-3 text-sm font-semibold text-white <?= $error ? 'bg-rose-500' : 'bg-emerald-500' ?>"><?= h($error ?: $success) ?></div>
 <?php endif; ?>
