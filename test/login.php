@@ -31,7 +31,7 @@ $success = flash_get('success');
       <h1 class="text-2xl font-bold">Tizimga kirish</h1>
       <p class="mt-1 text-sm text-slate-600">Login va parolingizni kiriting. Rol avtomatik aniqlanadi.</p>
 
-      <form class="mt-6 space-y-4" method="POST" action="/olimpiada.uz/test/index.php" autocomplete="off">
+      <form class="mt-6 space-y-4" method="POST" action="/test/index.php" autocomplete="off">
         <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf, ENT_QUOTES) ?>">
         <div>
           <label class="mb-1 block text-sm font-medium">Login yoki Email</label>
@@ -45,8 +45,8 @@ $success = flash_get('success');
       </form>
 
       <div class="mt-4 flex items-center justify-between text-sm">
-        <a href="/olimpiada.uz/index.php" class="font-semibold text-slate-600 hover:text-slate-800">Bosh sahifaga qaytish</a>
-        <a href="/olimpiada.uz/test/register.php" class="font-semibold text-cyan-700 hover:text-cyan-800">Ro'yxatdan o'tish</a>
+        <a href="/index.php" class="font-semibold text-slate-600 hover:text-slate-800">Bosh sahifaga qaytish</a>
+        <a href="/test/register.php" class="font-semibold text-cyan-700 hover:text-cyan-800">Ro'yxatdan o'tish</a>
       </div>
     </section>
   </div>

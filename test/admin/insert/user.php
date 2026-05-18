@@ -5,12 +5,12 @@ require_once __DIR__ . '/../../database/Database.php';
 require_auth(['admin']);
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    redirect('/olimpiada.uz/test/admin/dashboard.php');
+    redirect('/test/admin/dashboard.php');
 }
 
 if (!verify_csrf($_POST['_csrf'] ?? '')) {
     flash_set('error', 'Xavfsizlik tekshiruvi muvaffaqiyatsiz.');
-    redirect('/olimpiada.uz/test/admin/dashboard.php');
+    redirect('/test/admin/dashboard.php');
 }
 
 $fullname = trim((string) ($_POST['fullname'] ?? ''));
@@ -23,12 +23,12 @@ $status = strtolower(trim((string) ($_POST['status'] ?? 'active')));
 
 if ($fullname === '' || $phone === '' || $email === '' || $username === '' || $password === '') {
     flash_set('error', 'Maydonlarni to\'ldiring.');
-    redirect('/olimpiada.uz/test/admin/dashboard.php');
+    redirect('/test/admin/dashboard.php');
 }
 
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     flash_set('error', 'Email formati noto\'g\'ri.');
-    redirect('/olimpiada.uz/test/admin/dashboard.php');
+    redirect('/test/admin/dashboard.php');
 }
 
 if (!in_array($role, ['admin', 'teacher', 'student'], true)) {
@@ -55,4 +55,4 @@ try {
     flash_set('error', 'Saqlashda xatolik: username/email/phone band bo\'lishi mumkin.');
 }
 
-redirect('/olimpiada.uz/test/admin/dashboard.php');
+redirect('/test/admin/dashboard.php');

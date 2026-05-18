@@ -17,12 +17,12 @@ if (!in_array($section, $allowed, true)) {
 }
 
 $menu = [
-    ['key' => 'dashboard', 'label' => 'Dashboard', 'icon' => 'dashboard', 'href' => '/olimpiada.uz/test/teacher/dashboard.php'],
-    ['key' => 'subjects', 'label' => 'Fanlar', 'icon' => 'teachers', 'href' => '/olimpiada.uz/test/teacher/subjects.php'],
-    ['key' => 'tests', 'label' => 'Testlar', 'icon' => 'tests', 'href' => '/olimpiada.uz/test/teacher/tests.php'],
-    ['key' => 'results', 'label' => 'Natijalar', 'icon' => 'results', 'href' => '/olimpiada.uz/test/teacher/results.php'],
-    ['key' => 'profile', 'label' => 'Profil', 'icon' => 'profile', 'href' => '/olimpiada.uz/test/teacher/profile.php'],
-    ['key' => 'settings', 'label' => 'Sozlamalar', 'icon' => 'settings', 'href' => '/olimpiada.uz/test/teacher/settings.php'],
+    ['key' => 'dashboard', 'label' => 'Dashboard', 'icon' => 'dashboard', 'href' => '/test/teacher/dashboard.php'],
+    ['key' => 'subjects', 'label' => 'Fanlar', 'icon' => 'teachers', 'href' => '/test/teacher/subjects.php'],
+    ['key' => 'tests', 'label' => 'Testlar', 'icon' => 'tests', 'href' => '/test/teacher/tests.php'],
+    ['key' => 'results', 'label' => 'Natijalar', 'icon' => 'results', 'href' => '/test/teacher/results.php'],
+    ['key' => 'profile', 'label' => 'Profil', 'icon' => 'profile', 'href' => '/test/teacher/profile.php'],
+    ['key' => 'settings', 'label' => 'Sozlamalar', 'icon' => 'settings', 'href' => '/test/teacher/settings.php'],
 ];
 
 $metrics = get_teacher_metrics($teacherId);
@@ -98,7 +98,7 @@ ob_start();
       <h3 class="font-heading text-xl font-semibold">Fan yaratish</h3>
       <button type="button" data-close="createSubjectModal" class="text-slate-500">X</button>
     </div>
-    <form method="POST" action="/olimpiada.uz/test/teacher/insert/subject.php" class="space-y-3">
+    <form method="POST" action="/test/teacher/insert/subject.php" class="space-y-3">
       <input type="hidden" name="_csrf" value="<?= h($csrf) ?>">
       <div>
         <label class="mb-1 block text-sm font-medium text-slate-700">Fan nomi</label>
@@ -115,7 +115,7 @@ ob_start();
       <h3 class="font-heading text-xl font-semibold">Fan tahrirlash</h3>
       <button type="button" data-close="editSubjectModal" class="text-slate-500">X</button>
     </div>
-    <form method="POST" action="/olimpiada.uz/test/teacher/update/subject.php" class="space-y-3">
+    <form method="POST" action="/test/teacher/update/subject.php" class="space-y-3">
       <input type="hidden" name="_csrf" value="<?= h($csrf) ?>">
       <input type="hidden" name="id" id="edit_subject_id">
       <div>
@@ -134,7 +134,7 @@ ob_start();
   </div>
 </div>
 
-<form id="deleteSubjectForm" method="POST" action="/olimpiada.uz/test/teacher/delete/subject.php" class="hidden">
+<form id="deleteSubjectForm" method="POST" action="/test/teacher/delete/subject.php" class="hidden">
   <input type="hidden" name="_csrf" value="<?= h($csrf) ?>">
   <input type="hidden" name="id" id="delete_subject_id">
 </form>
@@ -190,7 +190,7 @@ ob_start();
       <p class="text-sm text-slate-500">Avval test yarating, keyin Insert orqali savollar kiriting</p>
     </div>
     <div class="flex flex-wrap items-end gap-2">
-      <form method="GET" action="/olimpiada.uz/test/teacher/tests.php" class="flex items-end gap-2">
+      <form method="GET" action="/test/teacher/tests.php" class="flex items-end gap-2">
         <div>
           <label class="mb-1 block text-xs font-medium text-slate-600">Fan bo'yicha filter</label>
           <select name="subject_id" class="rounded-xl border border-slate-300 px-3 py-2 text-sm">
@@ -222,7 +222,7 @@ ob_start();
       <tbody>
       <?php foreach ($tests as $test): ?>
         <tr class="border-t border-slate-100 hover:bg-cyan-50/30">
-          <td class="px-4 py-3"><a class="text-cyan-700 hover:underline" href="/olimpiada.uz/test/teacher/test-questions.php?test_id=<?= (int) ($test['id'] ?? 0) ?>"><?= h($test['title'] ?? '-') ?></a></td>
+          <td class="px-4 py-3"><a class="text-cyan-700 hover:underline" href="/test/teacher/test-questions.php?test_id=<?= (int) ($test['id'] ?? 0) ?>"><?= h($test['title'] ?? '-') ?></a></td>
           <td class="px-4 py-3"><?= h($test['subject_name'] ?? '-') ?></td>
           <td class="px-4 py-3"><?= (int) ($test['duration_minutes'] ?? 0) ?> min</td>
           <td class="px-4 py-3"><?= ($test['visibility'] ?? 'open') === 'closed' ? 'Private #'.h($test['private_code'] ?? '-') : 'Public' ?></td>
@@ -230,7 +230,7 @@ ob_start();
           <td class="px-4 py-3"><?= h($test['created_at'] ?? '-') ?></td>
           <td class="px-4 py-3">
             <div class="flex gap-2">
-            <a href="/olimpiada.uz/test/teacher/test-questions.php?test_id=<?= (int) ($test['id'] ?? 0) ?>" class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-emerald-200 text-emerald-700 hover:bg-emerald-50" title="Insert">+</a>
+            <a href="/test/teacher/test-questions.php?test_id=<?= (int) ($test['id'] ?? 0) ?>" class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-emerald-200 text-emerald-700 hover:bg-emerald-50" title="Insert">+</a>
             <button type="button" class="editTest inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-300 text-slate-600 hover:bg-slate-50" data-id="<?= (int) ($test['id'] ?? 0) ?>" data-title="<?= h($test['title'] ?? '') ?>" data-subject-id="<?= (int) ($test['subject_id'] ?? 0) ?>" data-duration="<?= (int) ($test['duration_minutes'] ?? 60) ?>" data-attempts="<?= (int)($test['attempts_limit'] ?? 1) ?>" data-qlimit="<?= (int)($test['question_limit'] ?? 10) ?>" data-visibility="<?= h($test['visibility'] ?? 'open') ?>" title="Edit">✎</button>
             <button type="button" class="deleteTest inline-flex h-9 w-9 items-center justify-center rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50" data-id="<?= (int) ($test['id'] ?? 0) ?>" data-name="<?= h($test['title'] ?? '') ?>" title="O'chirish">
               <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
@@ -254,7 +254,7 @@ ob_start();
     <?php if (count($subjects) === 0): ?>
       <div class="rounded-xl bg-amber-50 p-4 text-sm text-amber-700">Avval fan yarating, keyin test qo'shasiz.</div>
     <?php else: ?>
-    <form method="POST" action="/olimpiada.uz/test/teacher/insert/tests.php" class="space-y-4">
+    <form method="POST" action="/test/teacher/insert/tests.php" class="space-y-4">
         <input type="hidden" name="_csrf" value="<?= h($csrf) ?>">
         <div><label class="mb-1 block text-sm font-medium">Fan</label><select name="subject_id" class="w-full rounded-xl border border-slate-300 px-3 py-2.5" required><option value="">Tanlang</option><?php foreach ($subjects as $subject): ?><option value="<?= (int)$subject['id'] ?>"><?= h($subject['name']) ?></option><?php endforeach; ?></select></div>
         <div><label class="mb-1 block text-sm font-medium">Test nomi</label><input name="title" class="w-full rounded-xl border border-slate-300 px-3 py-2.5" required></div><div><label class="mb-1 block text-sm font-medium">Davomiyligi (daqiqa)</label><input type="number" min="1" name="duration_minutes" class="w-full rounded-xl border border-slate-300 px-3 py-2.5" required></div><div><label class="mb-1 block text-sm font-medium">Urinishlar soni</label><input type="number" min="1" name="attempts_limit" value="1" class="w-full rounded-xl border border-slate-300 px-3 py-2.5" required></div><div><label class="mb-1 block text-sm font-medium">Savollar soni</label><input type="number" min="1" name="question_limit" value="10" class="w-full rounded-xl border border-slate-300 px-3 py-2.5" required></div><div><label class="mb-1 block text-sm font-medium">Test turi</label><select name="visibility" class="w-full rounded-xl border border-slate-300 px-3 py-2.5"><option value="open">Public</option><option value="closed">Private</option></select></div>
@@ -270,7 +270,7 @@ ob_start();
       <h3 class="font-heading text-2xl font-semibold">Test tahrirlash</h3>
       <button type="button" data-close="editTestModal" class="text-slate-500">X</button>
     </div>
-    <form method="POST" action="/olimpiada.uz/test/teacher/update/test.php" class="space-y-4">
+    <form method="POST" action="/test/teacher/update/test.php" class="space-y-4">
       <input type="hidden" name="_csrf" value="<?= h($csrf) ?>">
       <input type="hidden" name="id" id="edit_test_id">
       <div><label class="mb-1 block text-sm font-medium">Fan</label><select id="edit_test_subject_id" name="subject_id" class="w-full rounded-xl border border-slate-300 px-3 py-2.5" required><option value="" disabled>Tanlang</option><?php foreach ($subjects as $subject): ?><option value="<?= (int) $subject['id'] ?>"><?= h($subject['name']) ?></option><?php endforeach; ?></select></div>
@@ -281,7 +281,7 @@ ob_start();
   </div>
 </div>
 
-<form id="deleteTestForm" method="POST" action="/olimpiada.uz/test/teacher/delete/test.php" class="hidden">
+<form id="deleteTestForm" method="POST" action="/test/teacher/delete/test.php" class="hidden">
   <input type="hidden" name="_csrf" value="<?= h($csrf) ?>">
   <input type="hidden" name="id" id="delete_test_id">
 </form>
@@ -347,7 +347,7 @@ ob_start();
       <h2 class="font-heading text-lg font-semibold">Natijalar</h2>
       <p class="text-sm text-slate-500">O'zingiz yaratgan testlarni ishlagan o'quvchilar natijalari</p>
     </div>
-    <form method="GET" action="/olimpiada.uz/test/teacher/results.php" class="flex items-end gap-2">
+    <form method="GET" action="/test/teacher/results.php" class="flex items-end gap-2">
       <div>
         <label class="mb-1 block text-xs font-medium text-slate-600">Test bo'yicha filter</label>
         <select name="test_id" class="rounded-xl border border-slate-300 px-3 py-2 text-sm">
@@ -390,7 +390,7 @@ ob_start();
           <td class="px-4 py-3"><?= h($a['status'] ?? '-') ?></td>
           <td class="px-4 py-3"><?= h($a['submitted_at'] ?? $a['started_at'] ?? '-') ?></td>
           <td class="px-4 py-3">
-            <a href="/olimpiada.uz/test/teacher/attempt-view.php?attempt_id=<?= (int) ($a['id'] ?? 0) ?>" class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-300 text-slate-600 hover:bg-slate-50" title="Ko'rish">👁</a>
+            <a href="/test/teacher/attempt-view.php?attempt_id=<?= (int) ($a['id'] ?? 0) ?>" class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-300 text-slate-600 hover:bg-slate-50" title="Ko'rish">👁</a>
           </td>
         </tr>
       <?php endforeach; ?>

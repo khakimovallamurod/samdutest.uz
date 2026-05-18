@@ -16,13 +16,13 @@ if (!in_array($section, $allowed, true)) {
 }
 
 $menu = [
-    ['key' => 'dashboard', 'label' => 'Dashboard', 'icon' => 'dashboard', 'href' => '/olimpiada.uz/test/admin/dashboard.php'],
-    ['key' => 'teachers', 'label' => "O'qituvchilar", 'icon' => 'teachers', 'href' => '/olimpiada.uz/test/admin/teachers.php'],
-    ['key' => 'students', 'label' => 'Talabalar', 'icon' => 'students', 'href' => '/olimpiada.uz/test/admin/students.php'],
-    ['key' => 'tests', 'label' => 'Testlar', 'icon' => 'tests', 'href' => '/olimpiada.uz/test/admin/tests.php'],
-    ['key' => 'results', 'label' => 'Natijalar', 'icon' => 'results', 'href' => '/olimpiada.uz/test/admin/results.php'],
-    ['key' => 'stats', 'label' => 'Statistika', 'icon' => 'stats', 'href' => '/olimpiada.uz/test/admin/stats.php'],
-    ['key' => 'settings', 'label' => 'Sozlamalar', 'icon' => 'settings', 'href' => '/olimpiada.uz/test/admin/settings.php'],
+    ['key' => 'dashboard', 'label' => 'Dashboard', 'icon' => 'dashboard', 'href' => '/test/admin/dashboard.php'],
+    ['key' => 'teachers', 'label' => "O'qituvchilar", 'icon' => 'teachers', 'href' => '/test/admin/teachers.php'],
+    ['key' => 'students', 'label' => 'Talabalar', 'icon' => 'students', 'href' => '/test/admin/students.php'],
+    ['key' => 'tests', 'label' => 'Testlar', 'icon' => 'tests', 'href' => '/test/admin/tests.php'],
+    ['key' => 'results', 'label' => 'Natijalar', 'icon' => 'results', 'href' => '/test/admin/results.php'],
+    ['key' => 'stats', 'label' => 'Statistika', 'icon' => 'stats', 'href' => '/test/admin/stats.php'],
+    ['key' => 'settings', 'label' => 'Sozlamalar', 'icon' => 'settings', 'href' => '/test/admin/settings.php'],
 ];
 
 $counts = get_system_counts();
@@ -178,7 +178,7 @@ ob_start();
     </div>
   <?php elseif ($section === 'results'): ?>
     <div class="border-b border-slate-200 p-4">
-      <form method="GET" action="/olimpiada.uz/test/admin/results.php" class="flex items-end gap-2">
+      <form method="GET" action="/test/admin/results.php" class="flex items-end gap-2">
         <div>
           <label class="mb-1 block text-xs font-medium text-slate-600">Test bo'yicha filter</label>
           <select name="test_id" class="rounded-xl border border-slate-300 px-3 py-2 text-sm">
@@ -233,7 +233,7 @@ ob_start();
 <div id="insertModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/40 p-4">
   <div class="w-full max-w-xl rounded-2xl bg-white p-5 shadow-2xl">
     <div class="mb-4 flex items-center justify-between"><h3 class="font-heading text-lg font-semibold">Yangi foydalanuvchi</h3><button type="button" data-close="insertModal">✕</button></div>
-    <form method="POST" action="/olimpiada.uz/test/admin/insert/user.php" class="grid gap-3 md:grid-cols-2">
+    <form method="POST" action="/test/admin/insert/user.php" class="grid gap-3 md:grid-cols-2">
       <input type="hidden" name="_csrf" value="<?= h($csrf) ?>">
       <input class="rounded-xl border border-slate-200 px-3 py-2.5" name="fullname" placeholder="F.I.O" required>
       <input class="rounded-xl border border-slate-200 px-3 py-2.5" name="phone" placeholder="Telefon" required>
@@ -250,7 +250,7 @@ ob_start();
 <div id="editModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/40 p-4">
   <div class="w-full max-w-2xl rounded-2xl bg-white p-6 shadow-2xl">
     <div class="mb-4 flex items-center justify-between"><h3 class="font-heading text-lg font-semibold">Foydalanuvchini tahrirlash</h3><button type="button" data-close="editModal">✕</button></div>
-    <form method="POST" action="/olimpiada.uz/test/admin/update/user.php" class="grid gap-3 md:grid-cols-2">
+    <form method="POST" action="/test/admin/update/user.php" class="grid gap-3 md:grid-cols-2">
       <input type="hidden" name="_csrf" value="<?= h($csrf) ?>">
       <input type="hidden" name="id" id="edit_id">
       <input class="rounded-xl border border-slate-200 px-3 py-2.5" name="fullname" id="edit_fullname" placeholder="F.I.O" required>
@@ -264,7 +264,7 @@ ob_start();
   </div>
 </div>
 
-<form id="deleteForm" method="POST" action="/olimpiada.uz/test/admin/delete/user.php" class="hidden">
+<form id="deleteForm" method="POST" action="/test/admin/delete/user.php" class="hidden">
   <input type="hidden" name="_csrf" value="<?= h($csrf) ?>">
   <input type="hidden" name="id" id="delete_id">
 </form>

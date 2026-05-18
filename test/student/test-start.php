@@ -15,7 +15,7 @@ try {
     $questions = get_student_test_questions($testId);
     if (!$test || count($questions) === 0) {
         flash_set('error', 'Test topilmadi yoki savollar mavjud emas.');
-        redirect('/olimpiada.uz/test/student/dashboard.php?section=tests');
+        redirect('/test/student/dashboard.php?section=tests');
     }
 
     $db = Database::connection();
@@ -29,7 +29,7 @@ try {
         $guard->close();
         $maxAttempts = max(1, (int)($test['attempts_limit'] ?? 1));
         $cnt = 0; $cst = $db->prepare("SELECT COUNT(*) c FROM test_attempts WHERE test_id=? AND student_id=? AND status<>'in_progress'"); if($cst){$cst->bind_param('ii',$testId,$studentId);$cst->execute();$row=$cst->get_result()->fetch_assoc();$cnt=(int)($row['c']??0);$cst->close();}
-        if ($cnt >= $maxAttempts) { flash_set('error', 'Urinishlar tugagan'); redirect('/olimpiada.uz/test/student/dashboard.php?section=tests'); }
+        if ($cnt >= $maxAttempts) { flash_set('error', 'Urinishlar tugagan'); redirect('/test/student/dashboard.php?section=tests'); }
     }
 
     $duration = max(1, (int) ($test['duration_minutes'] ?? 60));
@@ -50,7 +50,7 @@ try {
 } catch (Throwable $e) {
     error_log('Student test-start error: ' . $e->getMessage());
     flash_set('error', 'Testni boshlashda xatolik yuz berdi.');
-    redirect('/olimpiada.uz/test/student/dashboard.php?section=tests');
+    redirect('/test/student/dashboard.php?section=tests');
 }
 ?>
 <!doctype html>
@@ -69,7 +69,7 @@ try {
       <p class="mt-1 text-sm font-semibold text-rose-600">Qolgan vaqt: <span id="timer">--:--</span></p>
     </header>
 
-    <form id="testForm" method="POST" action="/olimpiada.uz/test/student/test-submit.php" class="space-y-4">
+    <form id="testForm" method="POST" action="/test/student/test-submit.php" class="space-y-4">
       <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf, ENT_QUOTES, 'UTF-8') ?>">
       <input type="hidden" name="attempt_id" value="<?= $attemptId ?>">
       <input type="hidden" name="test_id" value="<?= $testId ?>">

@@ -5,24 +5,24 @@ require_once __DIR__ . '/../../database/Database.php';
 require_auth(['admin']);
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    redirect('/olimpiada.uz/test/admin/dashboard.php');
+    redirect('/test/admin/dashboard.php');
 }
 
 if (!verify_csrf($_POST['_csrf'] ?? '')) {
     flash_set('error', 'Xavfsizlik tekshiruvi muvaffaqiyatsiz.');
-    redirect('/olimpiada.uz/test/admin/dashboard.php');
+    redirect('/test/admin/dashboard.php');
 }
 
 $id = (int) ($_POST['id'] ?? 0);
 $auth = auth_user();
 if ($id <= 0) {
     flash_set('error', 'Noto\'g\'ri foydalanuvchi.');
-    redirect('/olimpiada.uz/test/admin/dashboard.php');
+    redirect('/test/admin/dashboard.php');
 }
 
 if ((int) ($auth['id'] ?? 0) === $id) {
     flash_set('error', 'O\'zingizni o\'chira olmaysiz.');
-    redirect('/olimpiada.uz/test/admin/dashboard.php');
+    redirect('/test/admin/dashboard.php');
 }
 
 try {
@@ -40,4 +40,4 @@ try {
     flash_set('error', 'O\'chirishda xatolik yuz berdi.');
 }
 
-redirect('/olimpiada.uz/test/admin/dashboard.php');
+redirect('/test/admin/dashboard.php');

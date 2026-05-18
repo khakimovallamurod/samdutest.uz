@@ -6,12 +6,12 @@ require_once __DIR__ . '/../../shared/dashboard_repository.php';
 require_auth(['teacher']);
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    redirect('/olimpiada.uz/test/teacher/tests.php');
+    redirect('/test/teacher/tests.php');
 }
 
 if (!verify_csrf($_POST['_csrf'] ?? '')) {
     flash_set('error', 'Xavfsizlik tekshiruvi muvaffaqiyatsiz.');
-    redirect('/olimpiada.uz/test/teacher/tests.php');
+    redirect('/test/teacher/tests.php');
 }
 
 $teacherId = (int) (auth_user()['id'] ?? 0);
@@ -25,7 +25,7 @@ $visibility = trim((string) ($_POST['visibility'] ?? 'open'));
 
 if ($id <= 0 || $subjectId <= 0 || $title === '' || $duration <= 0 || $attempts <= 0 || $qLimit <= 0) {
     flash_set('error', 'Barcha maydonlarni to\'g\'ri kiriting.');
-    redirect('/olimpiada.uz/test/teacher/tests.php');
+    redirect('/test/teacher/tests.php');
 }
 try {
     $db = Database::connection();
@@ -50,4 +50,4 @@ try {
     flash_set('error', 'Test yangilashda xatolik yuz berdi.');
 }
 
-redirect('/olimpiada.uz/test/teacher/tests.php');
+redirect('/test/teacher/tests.php');

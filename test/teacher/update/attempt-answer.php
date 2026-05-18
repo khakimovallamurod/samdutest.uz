@@ -6,11 +6,11 @@ require_once __DIR__ . '/../../shared/dashboard_repository.php';
 require_auth(['teacher']);
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    redirect('/olimpiada.uz/test/teacher/results.php');
+    redirect('/test/teacher/results.php');
 }
 if (!verify_csrf($_POST['_csrf'] ?? '')) {
     flash_set('error', 'Xavfsizlik tekshiruvi muvaffaqiyatsiz.');
-    redirect('/olimpiada.uz/test/teacher/results.php');
+    redirect('/test/teacher/results.php');
 }
 
 $teacherId = (int) (auth_user()['id'] ?? 0);
@@ -21,7 +21,7 @@ $isCorrect = ($markRaw === '1') ? 1 : 0;
 
 if ($attemptId <= 0 || $answerId <= 0) {
     flash_set('error', 'Noto\'g\'ri so\'rov.');
-    redirect('/olimpiada.uz/test/teacher/results.php');
+    redirect('/test/teacher/results.php');
 }
 
 try {
@@ -43,7 +43,7 @@ try {
 
     if (!$row) {
         flash_set('error', 'Baholash uchun javob topilmadi.');
-        redirect('/olimpiada.uz/test/teacher/attempt-view.php?attempt_id=' . $attemptId);
+        redirect('/test/teacher/attempt-view.php?attempt_id=' . $attemptId);
     }
 
     $up = $db->prepare("UPDATE test_attempt_answers SET is_correct=?, checked_by_teacher=1, updated_at=NOW() WHERE id=? LIMIT 1");
@@ -61,4 +61,4 @@ try {
     flash_set('error', 'Baholashda xatolik yuz berdi.');
 }
 
-redirect('/olimpiada.uz/test/teacher/attempt-view.php?attempt_id=' . $attemptId);
+redirect('/test/teacher/attempt-view.php?attempt_id=' . $attemptId);

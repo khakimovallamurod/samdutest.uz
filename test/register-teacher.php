@@ -26,7 +26,7 @@ $success = flash_get('success');
       <h1 class="text-2xl font-bold">O'qituvchi ro'yxatdan o'tish</h1>
       <p class="mt-1 text-sm text-slate-500">Formani to'ldiring. Admin tasdig'idan keyin akkaunt faollashadi.</p>
 
-      <form class="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2" method="POST" action="/olimpiada.uz/test/auth/register-teacher.php" autocomplete="off">
+      <form class="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2" method="POST" action="/test/auth/register-teacher.php" autocomplete="off">
         <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf, ENT_QUOTES) ?>">
 
         <div class="md:col-span-2">
@@ -76,7 +76,7 @@ $success = flash_get('success');
 
         <div class="md:col-span-2 flex gap-3">
           <button class="rounded-xl bg-gradient-to-r from-green-500 to-cyan-500 px-5 py-3 font-semibold text-white">Yuborish</button>
-          <a href="/olimpiada.uz/test/login.php" class="rounded-xl bg-slate-100 px-5 py-3 font-semibold text-slate-700">Loginga qaytish</a>
+          <a href="/test/login.php" class="rounded-xl bg-slate-100 px-5 py-3 font-semibold text-slate-700">Loginga qaytish</a>
         </div>
       </form>
     </div>

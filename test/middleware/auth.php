@@ -9,7 +9,7 @@ function require_auth($roles = [])
     $auth = auth_user();
     if (!$auth || empty($auth['id'])) {
         flash_set('error', 'Iltimos, tizimga kiring.');
-        redirect('/olimpiada.uz/test/login.php');
+        redirect('/test/login.php');
     }
 
     $ttl = (int) app_config()['session_ttl'];
@@ -17,7 +17,7 @@ function require_auth($roles = [])
     if ($loggedAt > 0 && (time() - $loggedAt > $ttl)) {
         logout_user();
         flash_set('error', 'Sessiya vaqti tugadi. Qayta kiring.');
-        redirect('/olimpiada.uz/test/login.php');
+        redirect('/test/login.php');
     }
 
     if (!empty($roles)) {

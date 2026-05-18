@@ -5,11 +5,11 @@ require_once __DIR__ . '/../database/Database.php';
 
 require_auth(['student']);
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    redirect('/olimpiada.uz/test/student/dashboard.php?section=tests');
+    redirect('/test/student/dashboard.php?section=tests');
 }
 if (!verify_csrf($_POST['_csrf'] ?? '')) {
     flash_set('error', 'Xavfsizlik tekshiruvi muvaffaqiyatsiz.');
-    redirect('/olimpiada.uz/test/student/dashboard.php?section=tests');
+    redirect('/test/student/dashboard.php?section=tests');
 }
 
 $user = auth_user();
@@ -40,7 +40,7 @@ try {
             $done->close();
             if ($already) {
                 $db->commit();
-                redirect('/olimpiada.uz/test/student/attempt-view.php?attempt_id=' . $attemptId);
+                redirect('/test/student/attempt-view.php?attempt_id=' . $attemptId);
             }
         }
         throw new RuntimeException('attempt not found');
@@ -138,12 +138,12 @@ try {
     $db->commit();
 
     flash_set('success', 'Test yakunlandi.');
-    redirect('/olimpiada.uz/test/student/attempt-view.php?attempt_id=' . $attemptId);
+    redirect('/test/student/attempt-view.php?attempt_id=' . $attemptId);
 } catch (Throwable $e) {
     if (isset($db) && $db instanceof mysqli) {
         $db->rollback();
     }
     error_log('Student test-submit error: ' . $e->getMessage());
     flash_set('error', 'Yakunlashda xatolik yuz berdi. Qayta urinib ko\'ring.');
-    redirect('/olimpiada.uz/test/student/dashboard.php?section=tests');
+    redirect('/test/student/dashboard.php?section=tests');
 }

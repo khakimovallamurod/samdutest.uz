@@ -31,7 +31,7 @@ $success = flash_get('success');
       <h1 class="text-2xl font-bold">Sistemada ro'yxatdan o'tish</h1>
       <p class="mt-1 text-sm text-slate-600">Foydalanuvchi ma'lumotlarini kiriting va rol tanlang.</p>
 
-      <form class="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2" method="POST" action="/olimpiada.uz/test/auth/register.php" autocomplete="off">
+      <form class="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2" method="POST" action="/test/auth/register.php" autocomplete="off">
         <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf, ENT_QUOTES) ?>">
         <div class="md:col-span-2">
           <label class="mb-1 block text-sm font-medium">F.I.O</label>
@@ -66,7 +66,7 @@ $success = flash_get('success');
       </form>
 
       <div class="mt-4 text-sm">
-        <a href="/olimpiada.uz/test/login.php" class="font-semibold text-cyan-700 hover:text-cyan-800">Tizimga kirish</a>
+        <a href="/test/login.php" class="font-semibold text-cyan-700 hover:text-cyan-800">Tizimga kirish</a>
       </div>
     </section>
   </div>

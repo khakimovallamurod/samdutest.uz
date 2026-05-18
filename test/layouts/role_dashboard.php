@@ -86,7 +86,7 @@ function render_dashboard_layout($opts)
         <?php endforeach; ?>
       </nav>
       <div class="absolute bottom-0 left-0 right-0 p-4">
-        <a href="/olimpiada.uz/test/auth/logout.php" class="flex items-center gap-3 rounded-xl bg-white/10 px-3 py-2.5 text-sm font-medium hover:bg-white/20">
+        <a href="/test/auth/logout.php" class="flex items-center gap-3 rounded-xl bg-white/10 px-3 py-2.5 text-sm font-medium hover:bg-white/20">
           <span class="h-5 w-5"><?= icon_svg('logout') ?></span>
           Chiqish
         </a>

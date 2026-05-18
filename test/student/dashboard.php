@@ -17,11 +17,11 @@ if (!in_array($section, $allowed, true)) {
 }
 
 $menu = [
-    ['key' => 'dashboard', 'label' => 'Dashboard', 'icon' => 'dashboard', 'href' => '/olimpiada.uz/test/student/dashboard.php?section=dashboard'],
-    ['key' => 'tests', 'label' => 'Testlar', 'icon' => 'tests', 'href' => '/olimpiada.uz/test/student/dashboard.php?section=tests'],
-    ['key' => 'my-results', 'label' => 'Mening natijalarim', 'icon' => 'results', 'href' => '/olimpiada.uz/test/student/dashboard.php?section=my-results'],
-    ['key' => 'profile', 'label' => 'Profil', 'icon' => 'profile', 'href' => '/olimpiada.uz/test/student/dashboard.php?section=profile'],
-    ['key' => 'settings', 'label' => 'Sozlamalar', 'icon' => 'settings', 'href' => '/olimpiada.uz/test/student/dashboard.php?section=settings'],
+    ['key' => 'dashboard', 'label' => 'Dashboard', 'icon' => 'dashboard', 'href' => '/test/student/dashboard.php?section=dashboard'],
+    ['key' => 'tests', 'label' => 'Testlar', 'icon' => 'tests', 'href' => '/test/student/dashboard.php?section=tests'],
+    ['key' => 'my-results', 'label' => 'Mening natijalarim', 'icon' => 'results', 'href' => '/test/student/dashboard.php?section=my-results'],
+    ['key' => 'profile', 'label' => 'Profil', 'icon' => 'profile', 'href' => '/test/student/dashboard.php?section=profile'],
+    ['key' => 'settings', 'label' => 'Sozlamalar', 'icon' => 'settings', 'href' => '/test/student/dashboard.php?section=settings'],
 ];
 
 $metrics = get_student_metrics($studentId);
@@ -111,7 +111,7 @@ ob_start();
         <?php if ($pTaken): ?>
           <button type="button" disabled class="mt-3 inline-flex cursor-not-allowed rounded-xl bg-slate-400 px-4 py-2 text-sm font-semibold text-white">Urinishlar tugagan</button>
         <?php else: ?>
-          <a href="/olimpiada.uz/test/student/test-start.php?test_id=<?= $ptid ?>&private_code=<?= urlencode((string)($privateTest['private_code'] ?? '')) ?>" class="mt-3 inline-flex rounded-xl bg-amber-600 px-4 py-2 text-sm font-semibold text-white">Private testni boshlash</a>
+          <a href="/test/student/test-start.php?test_id=<?= $ptid ?>&private_code=<?= urlencode((string)($privateTest['private_code'] ?? '')) ?>" class="mt-3 inline-flex rounded-xl bg-amber-600 px-4 py-2 text-sm font-semibold text-white">Private testni boshlash</a>
         <?php endif; ?>
       </article>
     </div>
@@ -128,7 +128,7 @@ ob_start();
         <?php if ($isTaken): ?>
           <button type="button" disabled class="mt-3 inline-flex cursor-not-allowed rounded-xl bg-slate-400 px-4 py-2 text-sm font-semibold text-white">Urinishlar tugagan</button>
         <?php else: ?>
-          <a href="/olimpiada.uz/test/student/test-start.php?test_id=<?= (int) ($t['id'] ?? 0) ?>" class="mt-3 inline-flex rounded-xl bg-cyan-600 px-4 py-2 text-sm font-semibold text-white">Boshlash</a>
+          <a href="/test/student/test-start.php?test_id=<?= (int) ($t['id'] ?? 0) ?>" class="mt-3 inline-flex rounded-xl bg-cyan-600 px-4 py-2 text-sm font-semibold text-white">Boshlash</a>
         <?php endif; ?>
       </article>
     <?php endforeach; ?>
@@ -163,7 +163,7 @@ ob_start();
         <td class="px-4 py-3"><?= (int) ($row['pending_count'] ?? 0) ?></td>
         <td class="px-4 py-3"><?= h($row['status'] ?? '-') ?></td>
         <td class="px-4 py-3"><?= h($row['taken_at'] ?? '-') ?></td>
-        <td class="px-4 py-3"><a class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-300 text-slate-600 hover:bg-slate-50" href="/olimpiada.uz/test/student/attempt-view.php?attempt_id=<?= (int) ($row['id'] ?? 0) ?>">👁</a></td>
+        <td class="px-4 py-3"><a class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-300 text-slate-600 hover:bg-slate-50" href="/test/student/attempt-view.php?attempt_id=<?= (int) ($row['id'] ?? 0) ?>">👁</a></td>
       </tr>
       <?php endforeach; ?>
       <?php if (count($results) === 0): ?>

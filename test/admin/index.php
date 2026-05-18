@@ -1,3 +1,3 @@
 <?php
-header('Location: /olimpiada.uz/test/admin/dashboard.php');
+header('Location: /test/admin/dashboard.php');
 exit;

@@ -14,17 +14,17 @@ $success = flash_get('success');
 $attempt = get_teacher_attempt_detail($teacherId, $attemptId);
 if (!$attempt) {
     flash_set('error', 'Urinish topilmadi.');
-    redirect('/olimpiada.uz/test/teacher/results.php');
+    redirect('/test/teacher/results.php');
 }
 $answers = get_attempt_answers($attemptId);
 
 $menu = [
-    ['key' => 'dashboard', 'label' => 'Dashboard', 'icon' => 'dashboard', 'href' => '/olimpiada.uz/test/teacher/dashboard.php'],
-    ['key' => 'subjects', 'label' => 'Fanlar', 'icon' => 'teachers', 'href' => '/olimpiada.uz/test/teacher/subjects.php'],
-    ['key' => 'tests', 'label' => 'Testlar', 'icon' => 'tests', 'href' => '/olimpiada.uz/test/teacher/tests.php'],
-    ['key' => 'results', 'label' => 'Natijalar', 'icon' => 'results', 'href' => '/olimpiada.uz/test/teacher/results.php'],
-    ['key' => 'profile', 'label' => 'Profil', 'icon' => 'profile', 'href' => '/olimpiada.uz/test/teacher/profile.php'],
-    ['key' => 'settings', 'label' => 'Sozlamalar', 'icon' => 'settings', 'href' => '/olimpiada.uz/test/teacher/settings.php'],
+    ['key' => 'dashboard', 'label' => 'Dashboard', 'icon' => 'dashboard', 'href' => '/test/teacher/dashboard.php'],
+    ['key' => 'subjects', 'label' => 'Fanlar', 'icon' => 'teachers', 'href' => '/test/teacher/subjects.php'],
+    ['key' => 'tests', 'label' => 'Testlar', 'icon' => 'tests', 'href' => '/test/teacher/tests.php'],
+    ['key' => 'results', 'label' => 'Natijalar', 'icon' => 'results', 'href' => '/test/teacher/results.php'],
+    ['key' => 'profile', 'label' => 'Profil', 'icon' => 'profile', 'href' => '/test/teacher/profile.php'],
+    ['key' => 'settings', 'label' => 'Sozlamalar', 'icon' => 'settings', 'href' => '/test/teacher/settings.php'],
 ];
 
 ob_start();
@@ -36,7 +36,7 @@ ob_start();
 <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-3">
   <div class="flex items-center justify-between">
     <h2 class="font-heading text-lg font-semibold"><?= h($attempt['student_name'] ?? ('Student #' . (int) ($attempt['student_id'] ?? 0))) ?> natijasi</h2>
-    <a href="/olimpiada.uz/test/teacher/results.php" class="rounded-xl border border-slate-300 px-3 py-2 text-sm">Orqaga</a>
+    <a href="/test/teacher/results.php" class="rounded-xl border border-slate-300 px-3 py-2 text-sm">Orqaga</a>
   </div>
   <p class="text-sm text-slate-600">Test: <strong><?= h($attempt['test_title'] ?? '-') ?></strong> | Fan: <strong><?= h($attempt['subject_name'] ?? '-') ?></strong></p>
   <p class="text-sm text-slate-600">To'g'ri: <strong><?= (int) ($attempt['correct_count'] ?? 0) ?></strong> | Xato: <strong><?= (int) ($attempt['wrong_count'] ?? 0) ?></strong> | Kutilmoqda: <strong><?= (int) ($attempt['pending_count'] ?? 0) ?></strong> | Holat: <strong><?= h($attempt['status'] ?? '-') ?></strong></p>
@@ -59,7 +59,7 @@ ob_start();
         <?php if ((int) ($a['checked_by_teacher'] ?? 0) === 1): ?>
           <p class="mt-2 text-sm <?= (int) ($a['is_correct'] ?? 0) === 1 ? 'text-emerald-700' : 'text-rose-700' ?>">Baholangan: <?= (int) ($a['is_correct'] ?? 0) === 1 ? 'To\'g\'ri' : 'Xato' ?></p>
         <?php else: ?>
-          <form method="POST" action="/olimpiada.uz/test/teacher/update/attempt-answer.php" class="mt-2 flex flex-wrap gap-2">
+          <form method="POST" action="/test/teacher/update/attempt-answer.php" class="mt-2 flex flex-wrap gap-2">
             <input type="hidden" name="_csrf" value="<?= h($csrf) ?>">
             <input type="hidden" name="attempt_id" value="<?= (int) $attemptId ?>">
             <input type="hidden" name="answer_id" value="<?= (int) ($a['id'] ?? 0) ?>">

@@ -6,18 +6,18 @@ require_once __DIR__ . '/../../shared/dashboard_repository.php';
 require_auth(['teacher']);
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    redirect('/olimpiada.uz/test/teacher/subjects.php');
+    redirect('/test/teacher/subjects.php');
 }
 
 if (!verify_csrf($_POST['_csrf'] ?? '')) {
     flash_set('error', 'Xavfsizlik tekshiruvi muvaffaqiyatsiz.');
-    redirect('/olimpiada.uz/test/teacher/subjects.php');
+    redirect('/test/teacher/subjects.php');
 }
 
 $id = (int) ($_POST['id'] ?? 0);
 if ($id <= 0) {
     flash_set('error', 'Noto\'g\'ri fan ID.');
-    redirect('/olimpiada.uz/test/teacher/subjects.php');
+    redirect('/test/teacher/subjects.php');
 }
 
 $teacherId = (int) (auth_user()['id'] ?? 0);
@@ -40,4 +40,4 @@ try {
     flash_set('error', 'Fan o\'chirishda xatolik yuz berdi.');
 }
 
-redirect('/olimpiada.uz/test/teacher/subjects.php');
+redirect('/test/teacher/subjects.php');
