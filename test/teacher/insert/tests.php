@@ -31,23 +31,6 @@ try {
     $db = Database::connection();
     ensure_teacher_tables($db);
 
-    // Subject current teacherga tegishli ekanini tekshirish.
-    $subjectCheck = $db->prepare('SELECT id FROM teacher_subjects WHERE id = ? AND teacher_id = ? LIMIT 1');
-    if (!$subjectCheck) {
-        throw new RuntimeException('Subject check prepare failed: ' . $db->error);
-    }
-    $subjectCheck->bind_param('ii', $subjectId, $teacherId);
-    if (!$subjectCheck->execute()) {
-        throw new RuntimeException('Subject check execute failed: ' . $subjectCheck->error);
-    }
-    $subjectRes = $subjectCheck->get_result();
-    $subjectExists = $subjectRes && $subjectRes->num_rows > 0;
-    $subjectCheck->close();
-    if (!$subjectExists) {
-        flash_set('error', 'Tanlangan fan sizga tegishli emas yoki mavjud emas.');
-        redirect('/test/teacher/tests.php');
-    }
-
     $privateCode = null;
     if ($testType === 'closed') {
         do {
