@@ -1,0 +1,2 @@
+<p>div[myid] {margin: 1px;}.</p>
+ 
