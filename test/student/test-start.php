@@ -39,10 +39,12 @@ try {
 
     $stmt = $db->prepare("INSERT INTO test_attempts (test_id, student_id, teacher_id, subject_id, started_at, duration_minutes, total_questions, status) VALUES (?, ?, ?, ?, NOW(), ?, ?, 'in_progress')");
     if (!$stmt) {
-        throw new RuntimeException('Attempt create failed');
+        throw new RuntimeException('Attempt create failed: ' . $db->error);
     }
     $stmt->bind_param('iiiiii', $testId, $studentId, $teacherId, $subjectId, $duration, $totalQuestions);
-    $stmt->execute();
+    if (!$stmt->execute()) {
+        throw new RuntimeException('Attempt execute failed: ' . $stmt->error);
+    }
     $attemptId = (int) $db->insert_id;
     $stmt->close();
 

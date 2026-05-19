@@ -434,7 +434,7 @@ function ensure_test_runtime_tables(mysqli $db)
         student_id INT UNSIGNED NOT NULL,
         teacher_id INT UNSIGNED DEFAULT NULL,
         subject_id INT UNSIGNED DEFAULT NULL,
-        started_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        started_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         finished_at DATETIME DEFAULT NULL,
         submitted_at DATETIME DEFAULT NULL,
         duration_spent INT UNSIGNED NOT NULL DEFAULT 0,
@@ -467,16 +467,42 @@ function ensure_test_runtime_tables(mysqli $db)
         student_answer_text TEXT DEFAULT NULL,
         is_correct TINYINT(1) DEFAULT NULL,
         checked_by_teacher TINYINT(1) NOT NULL DEFAULT 0,
-        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         UNIQUE KEY uq_attempt_question (attempt_id, question_id),
         KEY idx_answer_attempt (attempt_id),
         KEY idx_answer_correct (is_correct)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
     if (!column_exists($db, 'test_questions', 'question_type')) $db->query("ALTER TABLE test_questions ADD COLUMN question_type ENUM('open','closed') NOT NULL DEFAULT 'closed'");
+
+    // Keep runtime schema compatible across old/new server deployments.
+    if (!column_exists($db, 'test_attempts', 'teacher_id')) $db->query("ALTER TABLE test_attempts ADD COLUMN teacher_id INT UNSIGNED DEFAULT NULL");
+    if (!column_exists($db, 'test_attempts', 'subject_id')) $db->query("ALTER TABLE test_attempts ADD COLUMN subject_id INT UNSIGNED DEFAULT NULL");
     if (!column_exists($db, 'test_attempts', 'finished_at')) $db->query("ALTER TABLE test_attempts ADD COLUMN finished_at DATETIME DEFAULT NULL");
+    if (!column_exists($db, 'test_attempts', 'submitted_at')) $db->query("ALTER TABLE test_attempts ADD COLUMN submitted_at DATETIME DEFAULT NULL");
     if (!column_exists($db, 'test_attempts', 'duration_spent')) $db->query("ALTER TABLE test_attempts ADD COLUMN duration_spent INT UNSIGNED NOT NULL DEFAULT 0");
+    if (!column_exists($db, 'test_attempts', 'duration_minutes')) $db->query("ALTER TABLE test_attempts ADD COLUMN duration_minutes INT UNSIGNED NOT NULL DEFAULT 0");
+    if (!column_exists($db, 'test_attempts', 'total_questions')) $db->query("ALTER TABLE test_attempts ADD COLUMN total_questions INT UNSIGNED NOT NULL DEFAULT 0");
+    if (!column_exists($db, 'test_attempts', 'correct_count')) $db->query("ALTER TABLE test_attempts ADD COLUMN correct_count INT UNSIGNED NOT NULL DEFAULT 0");
+    if (!column_exists($db, 'test_attempts', 'wrong_count')) $db->query("ALTER TABLE test_attempts ADD COLUMN wrong_count INT UNSIGNED NOT NULL DEFAULT 0");
+    if (!column_exists($db, 'test_attempts', 'pending_count')) $db->query("ALTER TABLE test_attempts ADD COLUMN pending_count INT UNSIGNED NOT NULL DEFAULT 0");
+    if (!column_exists($db, 'test_attempts', 'score_percent')) $db->query("ALTER TABLE test_attempts ADD COLUMN score_percent INT UNSIGNED NOT NULL DEFAULT 0");
+    if (!column_exists($db, 'test_attempts', 'status')) $db->query("ALTER TABLE test_attempts ADD COLUMN status VARCHAR(32) NOT NULL DEFAULT 'in_progress'");
+
+    if (!column_exists($db, 'test_attempt_answers', 'question_type')) $db->query("ALTER TABLE test_attempt_answers ADD COLUMN question_type ENUM('open','closed') NOT NULL DEFAULT 'closed'");
+    if (!column_exists($db, 'test_attempt_answers', 'question_text')) $db->query("ALTER TABLE test_attempt_answers ADD COLUMN question_text TEXT NOT NULL");
+    if (!column_exists($db, 'test_attempt_answers', 'option_a')) $db->query("ALTER TABLE test_attempt_answers ADD COLUMN option_a TEXT DEFAULT NULL");
+    if (!column_exists($db, 'test_attempt_answers', 'option_b')) $db->query("ALTER TABLE test_attempt_answers ADD COLUMN option_b TEXT DEFAULT NULL");
+    if (!column_exists($db, 'test_attempt_answers', 'option_c')) $db->query("ALTER TABLE test_attempt_answers ADD COLUMN option_c TEXT DEFAULT NULL");
+    if (!column_exists($db, 'test_attempt_answers', 'option_d')) $db->query("ALTER TABLE test_attempt_answers ADD COLUMN option_d TEXT DEFAULT NULL");
+    if (!column_exists($db, 'test_attempt_answers', 'correct_option')) $db->query("ALTER TABLE test_attempt_answers ADD COLUMN correct_option ENUM('A','B','C','D') DEFAULT NULL");
+    if (!column_exists($db, 'test_attempt_answers', 'student_answer_option')) $db->query("ALTER TABLE test_attempt_answers ADD COLUMN student_answer_option ENUM('A','B','C','D') DEFAULT NULL");
+    if (!column_exists($db, 'test_attempt_answers', 'student_answer_text')) $db->query("ALTER TABLE test_attempt_answers ADD COLUMN student_answer_text TEXT DEFAULT NULL");
+    if (!column_exists($db, 'test_attempt_answers', 'is_correct')) $db->query("ALTER TABLE test_attempt_answers ADD COLUMN is_correct TINYINT(1) DEFAULT NULL");
+    if (!column_exists($db, 'test_attempt_answers', 'checked_by_teacher')) $db->query("ALTER TABLE test_attempt_answers ADD COLUMN checked_by_teacher TINYINT(1) NOT NULL DEFAULT 0");
+    if (!column_exists($db, 'test_attempt_answers', 'created_at')) $db->query("ALTER TABLE test_attempt_answers ADD COLUMN created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP");
+    if (!column_exists($db, 'test_attempt_answers', 'updated_at')) $db->query("ALTER TABLE test_attempt_answers ADD COLUMN updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP");
 }
 
 function get_student_test_subject_filters()
