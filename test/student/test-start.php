@@ -25,10 +25,13 @@ try {
     if ($guard) {
         $guard->bind_param('ii', $testId, $studentId);
         $guard->execute();
-        $latest = $guard->get_result()->fetch_assoc();
+        $guardId = 0;
+        $guardStatus = null;
+        $guard->bind_result($guardId, $guardStatus);
+        $guard->fetch();
         $guard->close();
         $maxAttempts = max(1, (int)($test['attempts_limit'] ?? 1));
-        $cnt = 0; $cst = $db->prepare("SELECT COUNT(*) c FROM test_attempts WHERE test_id=? AND student_id=? AND status<>'in_progress'"); if($cst){$cst->bind_param('ii',$testId,$studentId);$cst->execute();$row=$cst->get_result()->fetch_assoc();$cnt=(int)($row['c']??0);$cst->close();}
+        $cnt = 0; $cst = $db->prepare("SELECT COUNT(*) c FROM test_attempts WHERE test_id=? AND student_id=? AND status<>'in_progress'"); if($cst){$cst->bind_param('ii',$testId,$studentId);$cst->execute();$countRow=0;$cst->bind_result($countRow);if($cst->fetch()){$cnt=(int)$countRow;}$cst->close();}
         if ($cnt >= $maxAttempts) { flash_set('error', 'Urinishlar tugagan'); redirect('/test/student/dashboard.php?section=tests'); }
     }
 
@@ -36,17 +39,7 @@ try {
     $totalQuestions = count($questions);
     $teacherId = (int) ($test['teacher_id'] ?? 0);
     $subjectId = (int) ($test['subject_id'] ?? 0);
-
-    $stmt = $db->prepare("INSERT INTO test_attempts (test_id, student_id, teacher_id, subject_id, started_at, duration_minutes, total_questions, status) VALUES (?, ?, ?, ?, NOW(), ?, ?, 'in_progress')");
-    if (!$stmt) {
-        throw new RuntimeException('Attempt create failed: ' . $db->error);
-    }
-    $stmt->bind_param('iiiiii', $testId, $studentId, $teacherId, $subjectId, $duration, $totalQuestions);
-    if (!$stmt->execute()) {
-        throw new RuntimeException('Attempt execute failed: ' . $stmt->error);
-    }
-    $attemptId = (int) $db->insert_id;
-    $stmt->close();
+    $attemptId = 0;
 
     $endTs = time() + ($duration * 60);
 } catch (Throwable $e) {
@@ -76,6 +69,10 @@ try {
       <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf, ENT_QUOTES, 'UTF-8') ?>">
       <input type="hidden" name="attempt_id" value="<?= $attemptId ?>">
       <input type="hidden" name="test_id" value="<?= $testId ?>">
+      <input type="hidden" name="duration_minutes" value="<?= $duration ?>">
+      <input type="hidden" name="teacher_id" value="<?= $teacherId ?>">
+      <input type="hidden" name="subject_id" value="<?= $subjectId ?>">
+      <input type="hidden" name="total_questions" value="<?= $totalQuestions ?>">
 
       <?php foreach ($questions as $i => $q): ?>
         <section class="rounded-2xl border border-slate-200 bg-white p-4">

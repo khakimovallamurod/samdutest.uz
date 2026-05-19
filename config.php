@@ -3,7 +3,7 @@
     $host = "localhost";
     $user_db = "root";
     $password = "";
-    $db = "olimpiadadb";
+    $db = "samdutestdb";
 
     // Xatolarni foydalanuvchiga ko'rsatmaslik
   

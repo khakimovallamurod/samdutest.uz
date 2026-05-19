@@ -254,8 +254,7 @@ final class AuthService
             }
             $stmt->bind_param('s', $tokenHash);
             $stmt->execute();
-            $result = $stmt->get_result();
-            $row = $result ? $result->fetch_assoc() : null;
+            $row = self::stmtFetchAssoc($stmt);
             $stmt->close();
 
             if (!$row) {
@@ -398,8 +397,7 @@ final class AuthService
 
         $stmt->bind_param($types, ...$params);
         $stmt->execute();
-        $result = $stmt->get_result();
-        $user = $result ? $result->fetch_assoc() : null;
+        $user = self::stmtFetchAssoc($stmt);
         $stmt->close();
 
         return $user;
@@ -493,5 +491,38 @@ final class AuthService
         $insertId = $ok ? (int) $db->insert_id : 0;
         $stmt->close();
         return $insertId;
+    }
+
+    private static function stmtFetchAssoc(mysqli_stmt $stmt)
+    {
+        if (method_exists($stmt, 'get_result')) {
+            $result = $stmt->get_result();
+            if ($result instanceof mysqli_result) {
+                return $result->fetch_assoc() ?: null;
+            }
+        }
+
+        $meta = $stmt->result_metadata();
+        if (!$meta) {
+            return null;
+        }
+
+        $row = [];
+        $bind = [];
+        while ($field = $meta->fetch_field()) {
+            $row[$field->name] = null;
+            $bind[] = &$row[$field->name];
+        }
+
+        call_user_func_array([$stmt, 'bind_result'], $bind);
+        if (!$stmt->fetch()) {
+            return null;
+        }
+
+        $assoc = [];
+        foreach ($row as $k => $v) {
+            $assoc[$k] = $v;
+        }
+        return $assoc;
     }
 }

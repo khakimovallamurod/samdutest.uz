@@ -32,6 +32,74 @@ function scalar_query(mysqli $db, $sql)
     return (int) ($row[0] ?? 0);
 }
 
+function stmt_fetch_assoc(mysqli_stmt $stmt)
+{
+    if (method_exists($stmt, 'get_result')) {
+        $result = $stmt->get_result();
+        if ($result instanceof mysqli_result) {
+            return $result->fetch_assoc() ?: null;
+        }
+    }
+
+    $meta = $stmt->result_metadata();
+    if (!$meta) {
+        return null;
+    }
+
+    $row = [];
+    $bind = [];
+    while ($field = $meta->fetch_field()) {
+        $row[$field->name] = null;
+        $bind[] = &$row[$field->name];
+    }
+
+    call_user_func_array([$stmt, 'bind_result'], $bind);
+    if (!$stmt->fetch()) {
+        return null;
+    }
+
+    $assoc = [];
+    foreach ($row as $k => $v) {
+        $assoc[$k] = $v;
+    }
+    return $assoc;
+}
+
+function stmt_fetch_all_assoc(mysqli_stmt $stmt)
+{
+    if (method_exists($stmt, 'get_result')) {
+        $result = $stmt->get_result();
+        $rows = [];
+        while ($result && ($row = $result->fetch_assoc())) {
+            $rows[] = $row;
+        }
+        return $rows;
+    }
+
+    $meta = $stmt->result_metadata();
+    if (!$meta) {
+        return [];
+    }
+
+    $row = [];
+    $bind = [];
+    while ($field = $meta->fetch_field()) {
+        $row[$field->name] = null;
+        $bind[] = &$row[$field->name];
+    }
+
+    call_user_func_array([$stmt, 'bind_result'], $bind);
+    $rows = [];
+    while ($stmt->fetch()) {
+        $item = [];
+        foreach ($row as $k => $v) {
+            $item[$k] = $v;
+        }
+        $rows[] = $item;
+    }
+    return $rows;
+}
+
 function get_system_counts()
 {
     $db = db_conn();
@@ -477,8 +545,11 @@ function ensure_test_runtime_tables(mysqli $db)
     if (!column_exists($db, 'test_questions', 'question_type')) $db->query("ALTER TABLE test_questions ADD COLUMN question_type ENUM('open','closed') NOT NULL DEFAULT 'closed'");
 
     // Keep runtime schema compatible across old/new server deployments.
+    if (!column_exists($db, 'test_attempts', 'test_id')) $db->query("ALTER TABLE test_attempts ADD COLUMN test_id INT UNSIGNED NOT NULL DEFAULT 0");
+    if (!column_exists($db, 'test_attempts', 'student_id')) $db->query("ALTER TABLE test_attempts ADD COLUMN student_id INT UNSIGNED NOT NULL DEFAULT 0");
     if (!column_exists($db, 'test_attempts', 'teacher_id')) $db->query("ALTER TABLE test_attempts ADD COLUMN teacher_id INT UNSIGNED DEFAULT NULL");
     if (!column_exists($db, 'test_attempts', 'subject_id')) $db->query("ALTER TABLE test_attempts ADD COLUMN subject_id INT UNSIGNED DEFAULT NULL");
+    if (!column_exists($db, 'test_attempts', 'started_at')) $db->query("ALTER TABLE test_attempts ADD COLUMN started_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP");
     if (!column_exists($db, 'test_attempts', 'finished_at')) $db->query("ALTER TABLE test_attempts ADD COLUMN finished_at DATETIME DEFAULT NULL");
     if (!column_exists($db, 'test_attempts', 'submitted_at')) $db->query("ALTER TABLE test_attempts ADD COLUMN submitted_at DATETIME DEFAULT NULL");
     if (!column_exists($db, 'test_attempts', 'duration_spent')) $db->query("ALTER TABLE test_attempts ADD COLUMN duration_spent INT UNSIGNED NOT NULL DEFAULT 0");
@@ -490,6 +561,8 @@ function ensure_test_runtime_tables(mysqli $db)
     if (!column_exists($db, 'test_attempts', 'score_percent')) $db->query("ALTER TABLE test_attempts ADD COLUMN score_percent INT UNSIGNED NOT NULL DEFAULT 0");
     if (!column_exists($db, 'test_attempts', 'status')) $db->query("ALTER TABLE test_attempts ADD COLUMN status VARCHAR(32) NOT NULL DEFAULT 'in_progress'");
 
+    if (!column_exists($db, 'test_attempt_answers', 'attempt_id')) $db->query("ALTER TABLE test_attempt_answers ADD COLUMN attempt_id INT UNSIGNED NOT NULL DEFAULT 0");
+    if (!column_exists($db, 'test_attempt_answers', 'question_id')) $db->query("ALTER TABLE test_attempt_answers ADD COLUMN question_id INT UNSIGNED NOT NULL DEFAULT 0");
     if (!column_exists($db, 'test_attempt_answers', 'question_type')) $db->query("ALTER TABLE test_attempt_answers ADD COLUMN question_type ENUM('open','closed') NOT NULL DEFAULT 'closed'");
     if (!column_exists($db, 'test_attempt_answers', 'question_text')) $db->query("ALTER TABLE test_attempt_answers ADD COLUMN question_text TEXT NOT NULL");
     if (!column_exists($db, 'test_attempt_answers', 'option_a')) $db->query("ALTER TABLE test_attempt_answers ADD COLUMN option_a TEXT DEFAULT NULL");
@@ -503,6 +576,43 @@ function ensure_test_runtime_tables(mysqli $db)
     if (!column_exists($db, 'test_attempt_answers', 'checked_by_teacher')) $db->query("ALTER TABLE test_attempt_answers ADD COLUMN checked_by_teacher TINYINT(1) NOT NULL DEFAULT 0");
     if (!column_exists($db, 'test_attempt_answers', 'created_at')) $db->query("ALTER TABLE test_attempt_answers ADD COLUMN created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP");
     if (!column_exists($db, 'test_attempt_answers', 'updated_at')) $db->query("ALTER TABLE test_attempt_answers ADD COLUMN updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP");
+
+    // Some servers keep legacy schema where id is not AUTO_INCREMENT; normalize it.
+    try {
+        $idAttempt = $db->query("SHOW COLUMNS FROM test_attempts LIKE 'id'");
+        $idAttemptRow = $idAttempt ? $idAttempt->fetch_assoc() : null;
+        if ($idAttemptRow) {
+            $extra = strtolower((string)($idAttemptRow['Extra'] ?? ''));
+            if (strpos($extra, 'auto_increment') === false) {
+                $db->query("ALTER TABLE test_attempts MODIFY id INT UNSIGNED NOT NULL AUTO_INCREMENT");
+            }
+            $pkRes = $db->query("SHOW INDEX FROM test_attempts WHERE Key_name='PRIMARY'");
+            $hasPk = $pkRes && $pkRes->num_rows > 0;
+            if (!$hasPk) {
+                $db->query("ALTER TABLE test_attempts ADD PRIMARY KEY (id)");
+            }
+        }
+    } catch (Throwable $e) {
+        error_log('ensure_test_runtime_tables(test_attempts id normalize): ' . $e->getMessage());
+    }
+
+    try {
+        $idAnswer = $db->query("SHOW COLUMNS FROM test_attempt_answers LIKE 'id'");
+        $idAnswerRow = $idAnswer ? $idAnswer->fetch_assoc() : null;
+        if ($idAnswerRow) {
+            $extra = strtolower((string)($idAnswerRow['Extra'] ?? ''));
+            if (strpos($extra, 'auto_increment') === false) {
+                $db->query("ALTER TABLE test_attempt_answers MODIFY id INT UNSIGNED NOT NULL AUTO_INCREMENT");
+            }
+            $pkRes = $db->query("SHOW INDEX FROM test_attempt_answers WHERE Key_name='PRIMARY'");
+            $hasPk = $pkRes && $pkRes->num_rows > 0;
+            if (!$hasPk) {
+                $db->query("ALTER TABLE test_attempt_answers ADD PRIMARY KEY (id)");
+            }
+        }
+    } catch (Throwable $e) {
+        error_log('ensure_test_runtime_tables(test_attempt_answers id normalize): ' . $e->getMessage());
+    }
 }
 
 function get_student_test_subject_filters()
@@ -559,15 +669,15 @@ function get_available_tests_for_student($subjectId = 0, $limit = 200)
     }
 
     $stmt->execute();
-    $res = $stmt->get_result();
-    $rows = [];
-    while ($res && ($row = $res->fetch_assoc())) {
+    $rows = stmt_fetch_all_assoc($stmt);
+    $filtered = [];
+    foreach ($rows as $row) {
         if ((int) ($row['question_count'] ?? 0) > 0) {
-            $rows[] = $row;
+            $filtered[] = $row;
         }
     }
     $stmt->close();
-    return $rows;
+    return $filtered;
 }
 
 function get_student_test_details($testId)
@@ -587,7 +697,7 @@ function get_student_test_details($testId)
     }
     $stmt->bind_param('i', $testId);
     $stmt->execute();
-    $row = $stmt->get_result()->fetch_assoc();
+    $row = stmt_fetch_assoc($stmt);
     $stmt->close();
     return $row ?: null;
 }
@@ -611,7 +721,7 @@ function get_student_test_details_with_private_code($testId, $privateCode = '')
         }
         $stmt->bind_param('is', $testId, $privateCode);
         $stmt->execute();
-        $row = $stmt->get_result()->fetch_assoc();
+        $row = stmt_fetch_assoc($stmt);
         $stmt->close();
         return $row ?: null;
     }
@@ -639,7 +749,7 @@ function get_private_test_for_student_by_code($privateCode)
     }
     $stmt->bind_param('s', $privateCode);
     $stmt->execute();
-    $row = $stmt->get_result()->fetch_assoc();
+    $row = stmt_fetch_assoc($stmt);
     $stmt->close();
     if (!$row || (int)($row['question_count'] ?? 0) <= 0) {
         return null;
@@ -658,7 +768,7 @@ function get_student_test_questions($testId)
     if ($limitStmt) {
         $limitStmt->bind_param('i', $testId);
         $limitStmt->execute();
-        $limitRow = $limitStmt->get_result()->fetch_assoc();
+        $limitRow = stmt_fetch_assoc($limitStmt);
         $limit = max(1, (int)($limitRow['q_limit'] ?? 10));
         $limitStmt->close();
     }
@@ -673,11 +783,7 @@ function get_student_test_questions($testId)
     }
     $stmt->bind_param('ii', $testId, $limit);
     $stmt->execute();
-    $res = $stmt->get_result();
-    $rows = [];
-    while ($res && ($row = $res->fetch_assoc())) {
-        $rows[] = $row;
-    }
+    $rows = stmt_fetch_all_assoc($stmt);
     $stmt->close();
     return $rows;
 }
@@ -701,11 +807,7 @@ function get_student_attempts($studentId, $limit = 50)
         if ($stmt) {
             $stmt->bind_param('ii', $studentId, $limit);
             $stmt->execute();
-            $res = $stmt->get_result();
-            $rows = [];
-            while ($res && ($row = $res->fetch_assoc())) {
-                $rows[] = $row;
-            }
+            $rows = stmt_fetch_all_assoc($stmt);
             $stmt->close();
             return $rows;
         }
@@ -730,9 +832,8 @@ function get_student_attempted_test_ids($studentId)
     }
     $stmt->bind_param('i', $studentId);
     $stmt->execute();
-    $res = $stmt->get_result();
     $ids = [];
-    while ($res && ($row = $res->fetch_assoc())) {
+    foreach (stmt_fetch_all_assoc($stmt) as $row) {
         $ids[] = (int) ($row['test_id'] ?? 0);
     }
     $stmt->close();
