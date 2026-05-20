@@ -4,10 +4,10 @@ require_once __DIR__ . '/../../database/Database.php';
 require_once __DIR__ . '/../../shared/dashboard_repository.php';
 
 require_auth(['teacher']);
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') { redirect('/test/teacher/tests.php'); }
-if (!verify_csrf($_POST['_csrf'] ?? '')) { flash_set('error', 'Xavfsizlik tekshiruvi muvaffaqiyatsiz.'); redirect('/test/teacher/tests.php'); }
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') { redirect('/test/teacher/tests/index.php'); }
+if (!verify_csrf($_POST['_csrf'] ?? '')) { flash_set('error', 'Xavfsizlik tekshiruvi muvaffaqiyatsiz.'); redirect('/test/teacher/tests/index.php'); }
 $teacherId = (int) (auth_user()['id'] ?? 0); $id = (int) ($_POST['id'] ?? 0);
-if ($id <= 0) { flash_set('error', 'Noto\'g\'ri test ID.'); redirect('/test/teacher/tests.php'); }
+if ($id <= 0) { flash_set('error', 'Noto\'g\'ri test ID.'); redirect('/test/teacher/tests/index.php'); }
 
 try {
   $db = Database::connection(); ensure_teacher_tables($db);
@@ -32,4 +32,4 @@ try {
 } catch (Throwable $e) {
   flash_set('error', 'Testni o\'chirishda xatolik.');
 }
-redirect('/test/teacher/tests.php');
+redirect('/test/teacher/tests/index.php');

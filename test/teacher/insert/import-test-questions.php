@@ -4,14 +4,14 @@ require_once __DIR__ . '/../../database/Database.php';
 require_once __DIR__ . '/../../shared/dashboard_repository.php';
 
 require_auth(['teacher']);
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') { redirect('/test/teacher/tests.php'); }
-if (!verify_csrf($_POST['_csrf'] ?? '')) { flash_set('error', 'Xavfsizlik tekshiruvi muvaffaqiyatsiz.'); redirect('/test/teacher/tests.php'); }
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') { redirect('/test/teacher/tests/index.php'); }
+if (!verify_csrf($_POST['_csrf'] ?? '')) { flash_set('error', 'Xavfsizlik tekshiruvi muvaffaqiyatsiz.'); redirect('/test/teacher/tests/index.php'); }
 
 $teacherId = (int) (auth_user()['id'] ?? 0);
 $testId = (int) ($_POST['test_id'] ?? 0);
-if ($testId <= 0) { flash_set('error', 'Noto\'g\'ri test ID.'); redirect('/test/teacher/tests.php'); }
-if (empty($_FILES['excel_file']['tmp_name'])) { flash_set('error', 'Excel fayl tanlanmagan.'); redirect('/test/teacher/test-questions.php?test_id=' . $testId); }
-if (!is_uploaded_file($_FILES['excel_file']['tmp_name'])) { flash_set('error', 'Yuklangan fayl topilmadi.'); redirect('/test/teacher/test-questions.php?test_id=' . $testId); }
+if ($testId <= 0) { flash_set('error', 'Noto\'g\'ri test ID.'); redirect('/test/teacher/tests/index.php'); }
+if (empty($_FILES['excel_file']['tmp_name'])) { flash_set('error', 'Excel fayl tanlanmagan.'); redirect('/test/teacher/tests/questions.php?test_id=' . $testId); }
+if (!is_uploaded_file($_FILES['excel_file']['tmp_name'])) { flash_set('error', 'Yuklangan fayl topilmadi.'); redirect('/test/teacher/tests/questions.php?test_id=' . $testId); }
 
 $db = Database::connection();
 ensure_teacher_tables($db);
@@ -21,7 +21,7 @@ $check->bind_param('ii', $testId, $teacherId);
 $check->execute();
 $exists = $check->get_result()->fetch_assoc();
 $check->close();
-if (!$exists) { flash_set('error', 'Test topilmadi.'); redirect('/test/teacher/tests.php'); }
+if (!$exists) { flash_set('error', 'Test topilmadi.'); redirect('/test/teacher/tests/index.php'); }
 
 $sanitize = function ($html) {
     $html = (string) $html;
@@ -33,7 +33,7 @@ $tmp = $_FILES['excel_file']['tmp_name'];
 $ext = strtolower(pathinfo((string)($_FILES['excel_file']['name'] ?? ''), PATHINFO_EXTENSION));
 if (!in_array($ext, ['xlsx', 'csv'], true)) {
     flash_set('error', 'Faqat .xlsx yoki .csv fayl qabul qilinadi.');
-    redirect('/test/teacher/test-questions.php?test_id=' . $testId);
+    redirect('/test/teacher/tests/questions.php?test_id=' . $testId);
 }
 
 $readRows = function (string $filePath, string $extension): array {
@@ -178,7 +178,7 @@ try {
     $rows = $readRows($tmp, $ext);
 } catch (Throwable $e) {
     flash_set('error', 'Fayl o\'qib bo\'lmadi: ' . $e->getMessage());
-    redirect('/test/teacher/test-questions.php?test_id=' . $testId);
+    redirect('/test/teacher/tests/questions.php?test_id=' . $testId);
 }
 
 try {
@@ -256,7 +256,7 @@ try {
     }
     if ($headerRowIndex === null) {
         flash_set('error', "Excel header topilmadi. Kerakli ustunlar: Savol, Type, A, B, C, D, Javob.");
-        redirect('/test/teacher/test-questions.php?test_id=' . $testId);
+        redirect('/test/teacher/tests/questions.php?test_id=' . $testId);
     }
 
     $created = 0;
@@ -354,4 +354,4 @@ try {
     error_log('Import test questions failed: ' . $e->getMessage());
     flash_set('error', 'Importda xatolik yuz berdi: ' . $e->getMessage());
 }
-redirect('/test/teacher/test-questions.php?test_id=' . $testId);
+redirect('/test/teacher/tests/questions.php?test_id=' . $testId);

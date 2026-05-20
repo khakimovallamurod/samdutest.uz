@@ -1,6 +1,46 @@
 <?php
 session_start();
 include_once 'config.php';
+
+function table_exists($link, $table) {
+    $table = mysqli_real_escape_string($link, $table);
+    $res = mysqli_query($link, "SHOW TABLES LIKE '{$table}'");
+    return $res && mysqli_num_rows($res) > 0;
+}
+
+function scalar_count($link, $sql) {
+    $res = mysqli_query($link, $sql);
+    if ($res && ($row = mysqli_fetch_row($res))) {
+        return (int) ($row[0] ?? 0);
+    }
+    return 0;
+}
+
+$studentCount = 0;
+$teacherCount = 0;
+$subjectCount = 0;
+$testCount = 0;
+
+if (table_exists($link, 'users')) {
+    $studentCount = scalar_count($link, "SELECT COUNT(*) FROM users WHERE role='student'");
+    $teacherCount = scalar_count($link, "SELECT COUNT(*) FROM users WHERE role='teacher'");
+}
+if ($studentCount === 0 && table_exists($link, 'students')) {
+    $studentCount = scalar_count($link, "SELECT COUNT(*) FROM students");
+}
+if ($teacherCount === 0 && table_exists($link, 'teacher_profiles')) {
+    $teacherCount = scalar_count($link, "SELECT COUNT(*) FROM teacher_profiles");
+}
+if (table_exists($link, 'subjects')) {
+    $subjectCount = scalar_count($link, "SELECT COUNT(*) FROM subjects");
+} elseif (table_exists($link, 'fan')) {
+    $subjectCount = scalar_count($link, "SELECT COUNT(*) FROM fan");
+}
+if (table_exists($link, 'tests')) {
+    $testCount = scalar_count($link, "SELECT COUNT(*) FROM tests");
+} elseif (table_exists($link, 'testlar')) {
+    $testCount = scalar_count($link, "SELECT COUNT(*) FROM testlar");
+}
 ?>
 <!doctype html>
 <html lang="uz">
@@ -141,7 +181,6 @@ include_once 'config.php';
           <a class="nav-link relative text-sm font-semibold text-slate-700 transition hover:text-brand active" href="#">Bosh sahifa</a>
           <a class="nav-link relative text-sm font-semibold text-slate-700 transition hover:text-brand" href="#features">Imkoniyatlar</a>
           <a class="nav-link relative text-sm font-semibold text-slate-700 transition hover:text-brand" href="#categories">Fanlar</a>
-          <a class="nav-link relative text-sm font-semibold text-slate-700 transition hover:text-brand" href="#nizom">Nizom</a>
           <a class="nav-link relative text-sm font-semibold text-slate-700 transition hover:text-brand" href="#faq">FAQ</a>
           <a class="nav-link relative text-sm font-semibold text-slate-700 transition hover:text-brand" href="results.php">Natijalar</a>
         </nav>
@@ -152,7 +191,6 @@ include_once 'config.php';
           <a class="rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100" href="#">Bosh sahifa</a>
           <a class="rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100" href="#features">Imkoniyatlar</a>
           <a class="rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100" href="#categories">Fanlar</a>
-          <a class="rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100" href="#nizom">Nizom</a>
           <a class="rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100" href="#faq">FAQ</a>
           <a class="rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100" href="results.php">Natijalar</a>
           <a href="test/" class="mt-1 rounded-lg bg-gradient-to-r from-brand to-accent px-3 py-2 text-center text-sm font-semibold text-white">Testlarni boshlash</a>
@@ -171,9 +209,9 @@ include_once 'config.php';
       </div>
       <div class="mx-auto grid max-w-7xl gap-10 px-4 md:grid-cols-12 md:items-center md:px-6 hero-wrap">
         <div class="md:col-span-7" data-aos="fade-up">
-          <p class="inline-flex items-center gap-2 rounded-full border border-brand/30 bg-brand/10 px-3 py-1 text-xs font-semibold text-brand">SamDU Iqtidorli talabalar bo'limi</p>
-          <h1 class="mt-5 font-heading text-3xl font-extrabold leading-tight text-slate-900 sm:text-5xl">Onlayn fan testlari uchun professional test platformasi</h1>
-          <p class="mt-5 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">Talabalar uchun zamonaviy test muhiti, real-time natijalar, reyting tizimi va sertifikatlash bilan yagona premium ekotizim.</p>
+          <p class="inline-flex items-center gap-2 rounded-full border border-brand/30 bg-brand/10 px-3 py-1 text-xs font-semibold text-brand">IT Markaz</p>
+          <h1 class="mt-5 font-heading text-3xl font-extrabold leading-tight text-slate-900 sm:text-5xl">Onlayn fan testlari uchun test platformasi</h1>
+          <p class="mt-5 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">Talabalar uchun zamonaviy test muhiti, real-time natijalar, reyting tizimi va sertifikatlash tizimi.</p>
           <div class="mt-7 flex flex-wrap items-center gap-3">
             <a href="test/" class="interactive-hover rounded-xl bg-gradient-to-r from-brand to-accent px-6 py-3 text-sm font-semibold text-white shadow-soft transition hover:scale-[1.02]">Testlarni boshlash</a>
             <a href="#categories" class="rounded-xl border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-700 transition hover:border-accent hover:text-accent">Yo'nalishlar</a>
@@ -184,23 +222,23 @@ include_once 'config.php';
             <div class="grid gap-4 sm:grid-cols-2">
               <article class="floating depth rounded-2xl bg-gradient-to-br from-brand/10 to-brand/5 p-4 ring-1 ring-brand/20">
                 <p class="text-xs text-slate-500">Talabalar</p>
-                <p class="mt-1 text-2xl font-extrabold text-slate-900" data-counter="3200">0</p>
-                <p class="text-xs font-medium text-brand">+15% o'sish</p>
+                <p class="mt-1 text-2xl font-extrabold text-slate-900" data-counter="<?= $studentCount ?>">0</p>
+                <p class="text-xs font-medium text-brand">Ro'yxatdan o'tganlar</p>
               </article>
               <article class="floating depth rounded-2xl bg-gradient-to-br from-accent/10 to-accent/5 p-4 ring-1 ring-accent/20" style="animation-delay: .5s;">
-                <p class="text-xs text-slate-500">Yo'nalishlar</p>
-                <p class="mt-1 text-2xl font-extrabold text-slate-900" data-counter="48">0</p>
-                <p class="text-xs font-medium text-accent">Yillik reja</p>
+                <p class="text-xs text-slate-500">O'qituvchilar</p>
+                <p class="mt-1 text-2xl font-extrabold text-slate-900" data-counter="<?= $teacherCount ?>">0</p>
+                <p class="text-xs font-medium text-accent">Faol o'qituvchilar</p>
               </article>
               <article class="floating depth rounded-2xl bg-gradient-to-br from-flame/10 to-flame/5 p-4 ring-1 ring-flame/20" style="animation-delay: .8s;">
-                <p class="text-xs text-slate-500">Sertifikatlar</p>
-                <p class="mt-1 text-2xl font-extrabold text-slate-900" data-counter="1760">0</p>
-                <p class="text-xs font-medium text-flame">Elektron format</p>
+                <p class="text-xs text-slate-500">Fanlar</p>
+                <p class="mt-1 text-2xl font-extrabold text-slate-900" data-counter="<?= $subjectCount ?>">0</p>
+                <p class="text-xs font-medium text-flame">Mavjud fanlar</p>
               </article>
               <article class="floating depth rounded-2xl bg-white p-4 ring-1 ring-slate-200" style="animation-delay: 1.1s;">
-                <p class="text-xs text-slate-500">Live natija</p>
-                <p class="mt-1 text-2xl font-extrabold text-slate-900">99.9%</p>
-                <p class="text-xs font-medium text-slate-500">Barqaror ishlash</p>
+                <p class="text-xs text-slate-500">Testlar soni</p>
+                <p class="mt-1 text-2xl font-extrabold text-slate-900" data-counter="<?= $testCount ?>">0</p>
+                <p class="text-xs font-medium text-slate-500">Jami testlar</p>
               </article>
             </div>
           </div>
@@ -231,9 +269,9 @@ include_once 'config.php';
 
     <section class="mx-auto max-w-7xl px-4 py-6 md:px-6 md:py-10">
       <div class="grid gap-4 rounded-3xl bg-white/90 p-5 shadow-soft ring-1 ring-slate-100 sm:grid-cols-3" data-aos="fade-up">
-        <div><p class="text-sm text-slate-500">Ro'yxatdan o'tgan talabalar</p><p class="text-3xl font-extrabold" data-counter="3200">0</p></div>
-        <div><p class="text-sm text-slate-500">Faol test yo'nalishlari</p><p class="text-3xl font-extrabold" data-counter="48">0</p></div>
-        <div><p class="text-sm text-slate-500">Yaratilgan sertifikatlar</p><p class="text-3xl font-extrabold" data-counter="1760">0</p></div>
+        <div><p class="text-sm text-slate-500">Talabalar soni</p><p class="text-3xl font-extrabold" data-counter="<?= $studentCount ?>">0</p></div>
+        <div><p class="text-sm text-slate-500">O'qituvchilar soni</p><p class="text-3xl font-extrabold" data-counter="<?= $teacherCount ?>">0</p></div>
+        <div><p class="text-sm text-slate-500">Fanlar soni</p><p class="text-3xl font-extrabold" data-counter="<?= $subjectCount ?>">0</p></div>
       </div>
     </section>
 
@@ -268,22 +306,6 @@ include_once 'config.php';
       </div>
     </section>
 
-    <section id="nizom" class="mx-auto max-w-7xl px-4 py-10 md:px-6 md:py-14">
-      <div class="rounded-3xl bg-gradient-to-br from-white to-slate-50 p-6 shadow-soft ring-1 ring-slate-100 md:p-8" data-aos="fade-up">
-        <h2 class="font-heading text-2xl font-extrabold text-slate-900">Test tizimi nizomi</h2>
-        <p class="mt-3 max-w-3xl text-sm leading-7 text-slate-600">Quyidagi tartiblar bo‘yicha testlar adolatli, vaqt bo‘yicha nazoratli va avtomatlashtirilgan baholash asosida o‘tkaziladi.</p>
-        <div class="mt-5 grid gap-3 md:grid-cols-2">
-          <article class="rounded-2xl border border-slate-200 bg-white p-4"><p class="text-xs font-semibold text-accent">01</p><p class="mt-1 text-sm leading-7 text-slate-700">Onlayn fan testlari belgilangan jadval asosida platforma orqali o‘tkaziladi.</p></article>
-          <article class="rounded-2xl border border-slate-200 bg-white p-4"><p class="text-xs font-semibold text-accent">02</p><p class="mt-1 text-sm leading-7 text-slate-700">Ro‘yxatdan o‘tish test boshlanishidan bir kun oldin 24:00 da yopiladi.</p></article>
-          <article class="rounded-2xl border border-slate-200 bg-white p-4"><p class="text-xs font-semibold text-accent">03</p><p class="mt-1 text-sm leading-7 text-slate-700">Har bir ishtirokchiga fan bo‘yicha test savollari va aniq vaqt limiti beriladi.</p></article>
-          <article class="rounded-2xl border border-slate-200 bg-white p-4"><p class="text-xs font-semibold text-accent">04</p><p class="mt-1 text-sm leading-7 text-slate-700">Natijalar to‘g‘ri javoblar soni va sarflangan vaqt asosida shakllanadi.</p></article>
-        </div>
-        <div class="mt-6 flex flex-wrap gap-3">
-          <a href="files/olimpiada nizomi.rtf" target="_blank" class="rounded-xl bg-gradient-to-r from-brand to-accent px-5 py-2.5 text-sm font-semibold text-white">Nizomni yuklab olish</a>
-          <a href="reg-users.php" class="rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 hover:border-brand hover:text-brand">Ro'yxatdan o'tganlar</a>
-        </div>
-      </div>
-    </section>
     <section id="faq" class="mx-auto max-w-7xl px-4 py-10 md:px-6 md:py-14">
       <div class="mb-8 text-center" data-aos="fade-up">
         <h2 class="font-heading text-3xl font-extrabold text-slate-900">Ko‘p So‘raladigan Savollar</h2>
@@ -302,23 +324,25 @@ include_once 'config.php';
     <div class="mx-auto max-w-7xl px-4 py-10 md:px-6">
       <div class="grid gap-8 md:grid-cols-3">
         <div>
-          <h3 class="font-heading text-lg font-bold">SamDU Test Tizimi</h3>
-          <p class="mt-2 text-sm text-slate-600">Samarqand davlat universiteti iqtidorli talabalar bilan ishlash bo'limi platformasi.</p>
+          <h3 class="font-heading text-lg font-bold">IT Markaz</h3>
+          <p class="mt-2 text-sm text-slate-600">Sharof Rashidov nomidagi Samarqand davlat universiteti qoshidagi IT Markaz.</p>
+          <p class="mt-2 text-sm text-slate-600">Manzil: Sun'iy intellekt va raqamli texnalogiyalari fakulteti binosi, 1-qavat.</p>
         </div>
         <div>
           <h3 class="font-heading text-lg font-bold">Aloqa</h3>
-          <p class="mt-2 text-sm text-slate-600">Web: olimpiada.samdu.uz</p>
-          <p class="text-sm text-slate-600">Natijalar: <a class="font-semibold text-accent" href="results.php">Ko'rish</a></p>
+          <p class="mt-2 text-sm text-slate-600">Telefon: <a class="font-semibold text-accent" href="tel:+998937286867">+998 93 728 68 67</a></p>
+          <p class="text-sm text-slate-600">Email: <a class="font-semibold text-accent" href="mailto:saidqulov98@bk.ru">saidqulov98@bk.ru</a></p>
+          <p class="text-sm text-slate-600">Telegram: <a class="font-semibold text-accent" href="https://t.me/itcenter_samdu" target="_blank" rel="noopener">@itcenter_samdu</a></p>
         </div>
         <div>
-          <h3 class="font-heading text-lg font-bold">Ijtimoiy tarmoqlar</h3>
-          <div class="mt-3 flex items-center gap-2">
-            <a href="https://t.me/samdu_iqtidorli_talaba" class="rounded-lg border border-slate-300 px-3 py-1.5 text-sm hover:border-accent hover:text-accent">Telegram</a>
-            <a href="http://samsim.uz" class="rounded-lg border border-slate-300 px-3 py-1.5 text-sm hover:border-brand hover:text-brand">SamSIM</a>
+          <h3 class="font-heading text-lg font-bold">Foydali havolalar</h3>
+          <div class="mt-3 flex flex-col items-start gap-2">
+            <a href="https://it-markaz.samdu.uz/" target="_blank" rel="noopener" class="rounded-lg border border-slate-300 px-3 py-1.5 text-sm hover:border-accent hover:text-accent">IT Markaz rasmiy sayti</a>
+            <a href="http://itmarkaz-system.sampc.uz/" target="_blank" rel="noopener" class="rounded-lg border border-slate-300 px-3 py-1.5 text-sm hover:border-brand hover:text-brand">IT Markaz System platformasi</a>
           </div>
         </div>
       </div>
-      <div class="mt-8 border-t border-slate-200 pt-4 text-sm text-slate-500">© <?= date('Y') ?> SamDU Iqtidorli talabalar bo'limi. Barcha huquqlar himoyalangan.</div>
+      <div class="mt-8 border-t border-slate-200 pt-4 text-sm text-slate-500">© <?= date('Y') ?> IT Markaz. Barcha huquqlar himoyalangan.</div>
     </div>
 </footer>
   <div id="cursorLanding" class="cursor-landing"></div>

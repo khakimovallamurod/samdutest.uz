@@ -5,11 +5,11 @@ require_once __DIR__ . '/../../shared/dashboard_repository.php';
 
 require_auth(['teacher']);
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    redirect('/test/teacher/tests.php');
+    redirect('/test/teacher/tests/index.php');
 }
 if (!verify_csrf($_POST['_csrf'] ?? '')) {
     flash_set('error', 'Xavfsizlik tekshiruvi muvaffaqiyatsiz.');
-    redirect('/test/teacher/tests.php');
+    redirect('/test/teacher/tests/index.php');
 }
 
 $teacherId = (int) (auth_user()['id'] ?? 0);
@@ -31,8 +31,9 @@ try {
 
     $sanitize = function ($html) {
         $html = (string) $html;
-        $allowed = '<p><br><b><strong><i><em><u><s><sub><sup><ol><ul><li><span><div><img><table><tbody><thead><tr><td><th><math><mrow><mi><mn><mo><msup><msub><msubsup><mfrac><msqrt><mroot><mtext><mfenced><mtable><mtr><mtd>';
-        return trim(strip_tags($html, $allowed));
+        $html = preg_replace('#<script(.*?)>(.*?)</script>#is', '', $html);
+        $html = preg_replace('#on[a-zA-Z]+\s*=\s*([\"\']).*?\\1#is', '', $html);
+        return trim($html);
     };
 
     $created = 0;
@@ -72,4 +73,4 @@ try {
     flash_set('error', 'Savol saqlashda xatolik: ' . $e->getMessage());
 }
 
-redirect('/test/teacher/test-questions.php?test_id=' . $testId);
+redirect('/test/teacher/tests/questions.php?test_id=' . $testId);
