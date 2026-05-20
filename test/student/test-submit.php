@@ -5,11 +5,11 @@ require_once __DIR__ . '/../database/Database.php';
 
 require_auth(['student']);
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    redirect('/test/student/dashboard.php?section=tests');
+    redirect('/test/student/tests.php');
 }
 if (!verify_csrf($_POST['_csrf'] ?? '')) {
     flash_set('error', 'Xavfsizlik tekshiruvi muvaffaqiyatsiz.');
-    redirect('/test/student/dashboard.php?section=tests');
+    redirect('/test/student/tests.php');
 }
 
 $user = auth_user();
@@ -357,5 +357,5 @@ try {
 } catch (Throwable $e) {
     error_log('Student test-submit error: ' . $e->getMessage());
     flash_set('error', 'Yakunlashda xatolik yuz berdi: ' . $e->getMessage());
-    redirect('/test/student/dashboard.php?section=tests');
+    redirect('/test/student/tests.php');
 }

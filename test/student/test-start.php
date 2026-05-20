@@ -15,7 +15,7 @@ try {
     $questions = get_student_test_questions($testId);
     if (!$test || count($questions) === 0) {
         flash_set('error', 'Test topilmadi yoki savollar mavjud emas.');
-        redirect('/test/student/dashboard.php?section=tests');
+        redirect('/test/student/tests.php');
     }
 
     $db = Database::connection();
@@ -32,7 +32,7 @@ try {
         $guard->close();
         $maxAttempts = max(1, (int)($test['attempts_limit'] ?? 1));
         $cnt = 0; $cst = $db->prepare("SELECT COUNT(*) c FROM test_attempts WHERE test_id=? AND student_id=? AND status<>'in_progress'"); if($cst){$cst->bind_param('ii',$testId,$studentId);$cst->execute();$countRow=0;$cst->bind_result($countRow);if($cst->fetch()){$cnt=(int)$countRow;}$cst->close();}
-        if ($cnt >= $maxAttempts) { flash_set('error', 'Urinishlar tugagan'); redirect('/test/student/dashboard.php?section=tests'); }
+        if ($cnt >= $maxAttempts) { flash_set('error', 'Urinishlar tugagan'); redirect('/test/student/tests.php'); }
     }
 
     $duration = max(1, (int) ($test['duration_minutes'] ?? 60));
@@ -45,7 +45,7 @@ try {
 } catch (Throwable $e) {
     error_log('Student test-start error: ' . $e->getMessage());
     flash_set('error', 'Testni boshlashda xatolik yuz berdi.');
-    redirect('/test/student/dashboard.php?section=tests');
+    redirect('/test/student/tests.php');
 }
 ?>
 <!doctype html>
@@ -55,7 +55,24 @@ try {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><?= htmlspecialchars($test['title'], ENT_QUOTES, 'UTF-8') ?> | Test</title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)'], ['$', '$']],
+        displayMath: [['\\[', '\\]'], ['$$', '$$']]
+      },
+      startup: {
+        ready: () => {
+          MathJax.startup.defaultReady();
+          MathJax.typesetPromise().catch(() => {});
+        }
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body class="bg-slate-50 text-slate-800">
   <main class="mx-auto max-w-4xl p-4 sm:p-6">
@@ -127,6 +144,12 @@ try {
 
     tick();
     setInterval(tick, 1000);
+
+    document.addEventListener('DOMContentLoaded', function () {
+      if (window.MathJax && typeof window.MathJax.typesetPromise === 'function') {
+        window.MathJax.typesetPromise().catch(() => {});
+      }
+    });
   </script>
 </body>
 </html>

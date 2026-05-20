@@ -1,7 +1,5 @@
 <?php
-require_once __DIR__ . '/../middleware/auth.php';
-require_once __DIR__ . '/../shared/dashboard_repository.php';
-require_once __DIR__ . '/../layouts/role_dashboard.php';
+require_once __DIR__ . '/_shared.php';
 
 require_auth(['student']);
 $user = auth_user();
@@ -24,7 +22,7 @@ $attempt = $st->get_result()->fetch_assoc();
 $st->close();
 if (!$attempt) {
     flash_set('error', 'Natija topilmadi.');
-    redirect('/test/student/dashboard.php?section=my-results');
+    redirect('/test/student/my-results.php');
 }
 
 $ansSt = $db->prepare("SELECT * FROM test_attempt_answers WHERE attempt_id=? ORDER BY question_id ASC");
@@ -37,14 +35,6 @@ while ($res && ($row = $res->fetch_assoc())) {
 }
 $ansSt->close();
 
-$menu = [
-    ['key' => 'dashboard', 'label' => 'Dashboard', 'icon' => 'dashboard', 'href' => '/test/student/dashboard.php?section=dashboard'],
-    ['key' => 'tests', 'label' => 'Testlar', 'icon' => 'tests', 'href' => '/test/student/dashboard.php?section=tests'],
-    ['key' => 'my-results', 'label' => 'Mening natijalarim', 'icon' => 'results', 'href' => '/test/student/dashboard.php?section=my-results'],
-    ['key' => 'profile', 'label' => 'Profil', 'icon' => 'profile', 'href' => '/test/student/dashboard.php?section=profile'],
-    ['key' => 'settings', 'label' => 'Sozlamalar', 'icon' => 'settings', 'href' => '/test/student/dashboard.php?section=settings'],
-];
-
 ob_start();
 ?>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -55,7 +45,7 @@ ob_start();
 <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-3">
   <div class="flex items-center justify-between">
     <h2 class="font-heading text-lg font-semibold"><?= h($attempt['title'] ?? 'Natija') ?></h2>
-    <a class="rounded-xl border border-slate-300 px-3 py-2 text-sm" href="/test/student/dashboard.php?section=my-results">Orqaga</a>
+    <a class="rounded-xl border border-slate-300 px-3 py-2 text-sm" href="/test/student/my-results.php">Orqaga</a>
   </div>
   <p class="text-sm text-slate-500">Fan: <?= h($attempt['subject_name'] ?? '-') ?> | Status: <?= h($attempt['status'] ?? '-') ?></p>
   <p class="text-sm text-slate-700">Boshlagan: <strong><?= h((string)($attempt['started_at'] ?? '-')) ?></strong> | Tugatgan: <strong><?= h((string)($attempt['finished_at'] ?? ($attempt['submitted_at'] ?? '-'))) ?></strong> | Vaqt: <strong><?= (int)($attempt['duration_spent'] ?? 0) ?> sek</strong></p>
@@ -92,7 +82,7 @@ render_dashboard_layout([
     'page_title' => 'Natija Detali',
     'subtitle' => 'Ishlangan test bo\'yicha tafsilot',
     'role_name' => 'Student',
-    'menu' => $menu,
+    'menu' => student_menu(),
     'active' => 'my-results',
     'user' => $user,
     'content' => $content,

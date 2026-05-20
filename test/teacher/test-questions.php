@@ -30,6 +30,15 @@ ob_start(); ?>
 <div class="flex items-center justify-between"><h2 class="font-heading text-lg font-semibold">Savollar: <?= h($test['title']??'-') ?></h2><a href="/test/teacher/tests.php" class="rounded-xl border border-slate-300 px-3 py-2 text-sm">Orqaga</a></div>
 <p class="text-sm text-slate-500">Fan: <?= h($test['subject_name']??'-') ?> | Davomiyligi: <?= (int)($test['duration_minutes']??0) ?> min</p>
 <div class="flex items-center gap-2"><button id="openAddQ" class="rounded-xl bg-green-700 px-4 py-2 text-white">+ Savol qo'shish</button><a href="/test/teacher/export-test-questions.php?test_id=<?= (int)$testId ?>" class="rounded-xl bg-emerald-700 px-4 py-2 text-sm font-semibold text-white">Export (CSV)</a><form method="GET" class="flex items-center gap-2"><input type="hidden" name="test_id" value="<?= (int)$testId ?>"><select name="qtype" class="rounded-xl border border-slate-300 px-3 py-2 text-sm"><option value="">Barcha turlar</option><option value="open" <?= $qTypeFilter==='open'?'selected':'' ?>>Ochiq</option><option value="closed" <?= $qTypeFilter==='closed'?'selected':'' ?>>Yopiq</option></select><button class="rounded-xl border border-slate-300 px-3 py-2 text-sm">Filter</button></form></div>
+<form method="POST" action="/test/teacher/insert/import-test-questions.php" enctype="multipart/form-data" class="rounded-xl border border-slate-200 bg-slate-50 p-3">
+  <input type="hidden" name="_csrf" value="<?= h($csrf) ?>">
+  <input type="hidden" name="test_id" value="<?= (int)$testId ?>">
+  <p class="mb-2 text-xs text-slate-600">Excel format: <strong>A=question_text</strong>, <strong>B=question_type(open/closed)</strong>, <strong>C=option_a</strong>, <strong>D=option_b</strong>, <strong>E=option_c</strong>, <strong>F=option_d</strong>, <strong>G=correct_option(A/B/C/D)</strong></p>
+  <div class="flex flex-wrap items-center gap-2">
+    <input type="file" name="excel_file" accept=".xlsx,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv" required class="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm">
+    <button class="rounded-xl bg-blue-700 px-4 py-2 text-sm font-semibold text-white">Excel/CSV import</button>
+  </div>
+</form>
 <div class="overflow-x-auto"><table class="min-w-full text-sm"><thead class="bg-slate-50"><tr><th class="px-3 py-2 text-left">Savol</th><th class="px-3 py-2 text-left">Turi</th><th class="px-3 py-2 text-left">To'g'ri javob</th></tr></thead><tbody><?php foreach($questions as $q): ?><tr class="border-t"><td class="formula-content px-3 py-2"><?= strip_tags((string)$q['question_text'],'<b><strong><i><em><u><s><sub><sup><ol><ul><li><p><br><span><div><img>') ?></td><td class="px-3 py-2"><?= h($q['question_type']??'closed') ?></td><td class="px-3 py-2"><?= h($q['correct_option']??'-') ?></td></tr><?php endforeach; ?></tbody></table></div>
 </section>
 <div id="formulaModal" class="fixed inset-0 z-[60] hidden items-center justify-center bg-slate-900/40 p-4">
